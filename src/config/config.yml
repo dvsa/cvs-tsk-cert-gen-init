@@ -1,0 +1,11 @@
+sqs:
+  local:
+    params:
+      region: sqs
+      endpoint: http://sqs:9324
+      apiVersion: "2012-11-05"
+    queueName: cert-gen-q
+  remote:
+    params:
+      apiVersion: "2012-11-05"
+    queueName: cert-gen-q
