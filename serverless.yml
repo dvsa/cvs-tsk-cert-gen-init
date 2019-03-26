@@ -1,0 +1,18 @@
+service: cvs-svc-activities
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+
+plugins:
+  - serverless-plugin-typescript
+
+functions:
+  main:
+    handler: src/handler.handler
+    events:
+    - stream:
+        batchSize: 100
+        startingPosition: LATEST
+        enabled: true

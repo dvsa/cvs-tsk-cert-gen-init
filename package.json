@@ -1,0 +1,59 @@
+{
+  "name": "cvs-tsk-cert-gen-init",
+  "version": "0.0.1",
+  "description": "Certificate generation initiation task",
+  "main": "handler.js",
+  "scripts": {
+    "start": "node_modules/serverless/bin/serverless invoke local -f main --path tests/resources/stream-event.json",
+    "start:docker": "docker-compose -f docker-compose.yml up -d",
+    "build": "node_modules/typescript/bin/tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
+    "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",
+    "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" \\)  | cpio -pdm .build",
+    "build:docker": "docker-compose -f docker-compose.yml up -d --build",
+    "test": "node_modules/.bin/mocha .build/tests/**/*.unitTest.js",
+    "tslint": "node_modules/tslint/bin/tslint --project .",
+    "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
+    "coverage": "node_modules/.bin/nyc mocha tests/unit/*.unitTest.ts && node_modules/.bin/nyc report --reporter=lcov"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
+    ],
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-lambda": "^0.1.2",
+    "aws-sdk": "^2.392.0",
+    "node-yaml": "^3.1.1",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.17",
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.18",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "nyc": "^13.3.0",
+    "serverless": "^1.36.3",
+    "serverless-plugin-typescript": "^1.1.5",
+    "tslint": "^5.12.1",
+    "ts-node-register": "^1.0.0",
+    "typescript": "^3.2.4"
+  }
+}
