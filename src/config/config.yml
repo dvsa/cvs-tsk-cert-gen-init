@@ -8,4 +8,4 @@ sqs:
   remote:
     params:
       apiVersion: "2012-11-05"
-    queueName: cert-gen-devops-queue
+    queueName: cert-gen-${BRANCH}-queue
