@@ -3,6 +3,9 @@ import {Service} from "../models/injector/ServiceDecorator";
 import {Configuration} from "../utils/Configuration";
 import {PromiseResult} from "aws-sdk/lib/request";
 import {AWSError, config as AWSConfig} from "aws-sdk";
+/* tslint:disable */
+const AWSXRay = require("aws-xray-sdk");
+/* tslint:enable */
 
 /**
  * Service class for interfacing with the Simple Queue Service
@@ -18,7 +21,7 @@ class SQService {
      */
     constructor(sqsClient: SQS) {
         const config: any = Configuration.getInstance().getConfig();
-        this.sqsClient = sqsClient;
+        this.sqsClient = AWSXRay.captureAWSClient(sqsClient);
 
         if (!config.sqs) {
             throw new Error("SQS config is not defined in the config file.");
