@@ -100,6 +100,14 @@ class SQMockClient {
         };
     }
 
+    /**
+     * Mock function required to support XRay capture. The XRay wrapper invokes this function, but doesn't care about the response.
+     * @returns {{}}
+     */
+    public customizeRequests(): any {
+        return {}
+    }
+
 }
 
 export {SQMockClient};

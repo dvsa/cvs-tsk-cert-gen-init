@@ -4,9 +4,18 @@ provider:
   name: aws
   runtime: nodejs8.10
   stage: dev
+  tracing: true # enable tracing
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource:
+        - "*"
 
 plugins:
   - serverless-plugin-typescript
+  - serverless-plugin-tracing
 
 functions:
   main:
