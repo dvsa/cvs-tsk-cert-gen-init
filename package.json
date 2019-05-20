@@ -51,7 +51,7 @@
     "@types/node": "^10.14.7",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
-    "nyc": "^13.3.0",
+    "nyc": "^14.1.1",
     "serverless": "^1.42.3",
     "serverless-plugin-tracing": "^2.0.0",
     "serverless-plugin-typescript": "^1.1.7",
