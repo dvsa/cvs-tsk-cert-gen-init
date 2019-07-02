@@ -20,6 +20,7 @@ plugins:
 functions:
   main:
     handler: src/handler.handler
+    timeout: 15
     events:
     - stream:
         batchSize: 100
