@@ -1,6 +1,5 @@
 import {Callback, Context, Handler} from "aws-lambda";
-import {AWSError} from "aws-sdk";
-import {Injector} from "../models/injector/Injector";
+import {AWSError, SQS} from "aws-sdk";
 import {SQService} from "../services/SQService";
 import {PromiseResult} from "aws-sdk/lib/request";
 import {SendMessageResult} from "aws-sdk/clients/sqs";
@@ -22,7 +21,7 @@ const certGenInit: Handler = async (event: any, context?: Context, callback?: Ca
     const records: any[] = StreamService.getTestResultStream(event);
 
     // Instantiate the Simple Queue Service
-    const sqService: SQService = Injector.resolve<SQService>(SQService);
+    const sqService: SQService = new SQService(new SQS());
     const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
 
     // Add each record to the queue
