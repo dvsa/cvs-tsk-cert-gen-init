@@ -21,18 +21,16 @@ describe("certGenInit Function", () => {
   });
 
   describe("when SQService throws error", () => {
-    it("should return undefined", async () => {
+    it("should throw error", async () => {
       StreamService.getTestResultStream = jest.fn().mockReturnValue([{}]);
       const myError = new Error("It Broke!");
       SQService.prototype.sendMessage = jest.fn().mockRejectedValue(myError);
 
       expect.assertions(1);
       try {
-        const result = await certGenInit({}, ctx, () => { return; });
-        expect(result).toBe(undefined);
+        await certGenInit({}, ctx, () => { return; });
       } catch (e) {
-        // Doesn't currently throw error. Probably should in a future revision
-        // expect(e.message).toEqual(myError.message);
+        expect(e.message).toEqual(myError.message);
       }
     });
   });
