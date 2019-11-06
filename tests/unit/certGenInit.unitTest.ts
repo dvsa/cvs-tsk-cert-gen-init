@@ -1,17 +1,13 @@
-import {describe} from "mocha";
-import {expect} from "chai";
 import {Injector} from "../../src/models/injector/Injector";
 import {SQService} from "../../src/services/SQService";
 import {SQMockClient} from "../models/SQMockClient";
-import * as fs from "fs";
-import * as path from "path";
 import {StreamService} from "../../src/services/StreamService";
 import {PromiseResult} from "aws-sdk/lib/request";
 import {ReceiveMessageResult, SendMessageResult} from "aws-sdk/clients/sqs";
 import {AWSError} from "aws-sdk";
+import event from "../resources/stream-event.json";
 
 describe("cert-gen-init", () => {
-    const event: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../resources/stream-event.json"), "utf8"));
     let processedEvent: any;
 
     context("StreamService", () => {
@@ -96,7 +92,7 @@ describe("cert-gen-init", () => {
         context("when fetching test result stream", () => {
             it("should result in an array of filtered js objects", () => {
                 processedEvent = StreamService.getTestResultStream(event);
-                expect(processedEvent).to.eql(expectedResult);
+                expect(processedEvent).toEqual(expectedResult);
             });
         });
     });
@@ -112,24 +108,20 @@ describe("cert-gen-init", () => {
                         sendMessagePromises.push(sqService.sendMessage(JSON.stringify(record)));
                     });
 
+                    expect.assertions(2);
                     return Promise.all(sendMessagePromises)
-                    .then(() => {
-                        expect.fail("Sending messages should fail if the queue is non existent");
-                    })
                     .catch((error: AWSError) => {
-                        expect(error).to.be.instanceOf(Error);
-                        expect(error.message).to.equal("Queue cert-gen-q was not found.");
+                        expect(error).toBeInstanceOf(Error);
+                        expect(error.message).toEqual("Queue cert-gen-q was not found.");
                     });
                 });
 
                 it("should fail to read any records from the queue", () => {
+                    expect.assertions(2);
                     return sqService.getMessages()
-                    .then(() => {
-                        expect.fail("Sending messages should fail if the queue is non existent");
-                    })
                     .catch((error: AWSError) => {
-                        expect(error).to.be.instanceOf(Error);
-                        expect(error.message).to.equal("Queue cert-gen-q was not found.");
+                        expect(error).toBeInstanceOf(Error);
+                        expect(error.message).toEqual("Queue cert-gen-q was not found.");
                     });
                 });
             });
@@ -145,17 +137,18 @@ describe("cert-gen-init", () => {
                         sendMessagePromises.push(sqService.sendMessage(JSON.stringify(record)));
                     });
 
+                    expect.assertions(0);
                     return Promise.all(sendMessagePromises)
                     .catch((error: AWSError) => {
                         console.error(error);
-                        expect.fail();
+                        expect(error).toBeFalsy();
                     });
                 });
 
                 it("should successfully read the added records from the queue", () => {
                     return sqService.getMessages()
                     .then((messages: ReceiveMessageResult) => {
-                        expect(messages.Messages!.map((message) => JSON.parse(message.Body as string))).to.eql(processedEvent);
+                        expect(messages.Messages!.map((message) => JSON.parse(message.Body as string))).toEqual(processedEvent);
                         sqService.sqsClient.deleteQueue({ QueueUrl: "sqs://queue/cert-gen-q" });
                     });
                 });

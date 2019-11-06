@@ -10,10 +10,11 @@
     "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" \\)  | cpio -pdm .build",
     "build:docker": "docker-compose -f docker-compose.yml up -d --build",
-    "test": "node_modules/.bin/mocha .build/tests/**/*.unitTest.js",
-    "tslint": "node_modules/tslint/bin/tslint --project .",
+    "test": "BRANCH=local SLS_DEBUG=* AWS_XRAY_CONTEXT_MISSING=LOG_ERROR jest --testMatch=\"**/*.unitTest.ts\" --coverage",
+    "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand --passWithNoTests",
+    "tslint": "tslint --project .",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
-    "coverage": "node_modules/.bin/nyc mocha tests/unit/*.unitTest.ts && node_modules/.bin/nyc report --reporter=lcov",
+    "coverage": "BRANCH=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --coverage",
     "audit-dep": "npm audit"
   },
   "nyc": {
@@ -39,24 +40,37 @@
   "license": "ISC",
   "dependencies": {
     "aws-lambda": "^0.1.2",
-    "aws-sdk": "^2.458.0",
-    "aws-xray-sdk": "^2.3.3",
+    "aws-sdk": "^2.562.0",
+    "aws-xray-sdk": "^2.4.0",
     "node-yaml": "^3.2.0",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.25",
-    "@types/chai": "^4.1.7",
-    "@types/mocha": "^5.2.5",
-    "@types/node": "^10.14.7",
-    "chai": "^4.2.0",
-    "mocha": "^5.2.0",
-    "nyc": "^14.1.1",
-    "serverless": "^1.42.3",
+    "@types/aws-lambda": "^8.10.34",
+    "@types/jest": "^24.0.21",
+    "@types/jest-plugin-context": "^2.9.2",
+    "@types/node": "^10.17.3",
+    "aws-lambda-mock-context": "^3.2.1",
+    "jest": "^24.9.0",
+    "jest-plugin-context": "^2.9.0",
+    "jest-sonar-reporter": "^2.0.0",
+    "serverless": "^1.56.1",
     "serverless-plugin-tracing": "^2.0.0",
-    "serverless-plugin-typescript": "^1.1.7",
+    "serverless-plugin-typescript": "^1.1.9",
+    "ts-jest": "^24.1.0",
     "ts-node-register": "^1.0.0",
-    "tslint": "^5.16.0",
-    "typescript": "^3.4.5"
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4"
+  },
+  "jestSonar": {
+    "reportPath": ".reports",
+    "reportFile": "test-report.xml",
+    "indent": 4
+  },
+  "jest": {
+    "coverageDirectory": "./coverage",
+    "collectCoverage": true,
+    "testResultsProcessor": "jest-sonar-reporter",
+    "testURL": "http://localhost"
   }
 }
