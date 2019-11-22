@@ -14,6 +14,7 @@
     "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand --passWithNoTests",
     "tslint": "tslint --project .",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
+    "security-checks": "git secrets --scan && git log -p | scanrepo",
     "coverage": "BRANCH=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --coverage",
     "audit-dep": "npm audit"
   },
@@ -51,6 +52,7 @@
     "@types/jest-plugin-context": "^2.9.2",
     "@types/node": "^10.17.3",
     "aws-lambda-mock-context": "^3.2.1",
+    "husky": "^3.0.9",
     "jest": "^24.9.0",
     "jest-plugin-context": "^2.9.0",
     "jest-sonar-reporter": "^2.0.0",
@@ -72,5 +74,11 @@
     "collectCoverage": true,
     "testResultsProcessor": "jest-sonar-reporter",
     "testURL": "http://localhost"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run security-checks",
+      "pre-push": "npm run prepush"
+    }
   }
 }
