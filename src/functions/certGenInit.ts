@@ -32,6 +32,7 @@ const certGenInit: Handler = async (event: any, context?: Context, callback?: Ca
     return Promise.all(sendMessagePromises)
     .catch((error: AWSError) => {
         console.error(error);
+        throw error;
     });
 };
 
