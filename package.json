@@ -14,7 +14,7 @@
     "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand --passWithNoTests",
     "tslint": "tslint --project .",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
-    "prepush": "npm test && npm run tslint && npm run security-checks",
+    "prepush": "npm test && npm run tslint",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
     "coverage": "BRANCH=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --coverage",
     "audit-dep": "npm audit"
