@@ -105,7 +105,7 @@ describe("cert-gen-init", () => {
                     const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
 
                     processedEvent.forEach(async (record: any) => {
-                        sendMessagePromises.push(sqService.sendMessage(JSON.stringify(record)));
+                        sendMessagePromises.push(sqService.sendCertGenMessage(JSON.stringify(record)));
                     });
 
                     expect.assertions(2);
@@ -134,7 +134,7 @@ describe("cert-gen-init", () => {
                     });
 
                     processedEvent.forEach(async (record: any) => {
-                        sendMessagePromises.push(sqService.sendMessage(JSON.stringify(record)));
+                        sendMessagePromises.push(sqService.sendCertGenMessage(JSON.stringify(record)));
                     });
 
                     expect.assertions(0);

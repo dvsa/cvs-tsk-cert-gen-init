@@ -35,13 +35,30 @@ class SQService {
     }
 
     /**
-     * Send a message to the queue
+     * Send a message to cert-gen queue
+     * @param messageBody
+     */
+    public sendCertGenMessage(messageBody: string) {
+        return this.sendMessage(messageBody, this.config.queueName[0]);
+    }
+
+    /**
+     * Send a message to update-status queue
+     * @param messageBody
+     */
+    public sendUpdateStatusMessage(messageBody: string) {
+        return this.sendMessage(messageBody, this.config.queueName[1]);
+    }
+
+    /**
+     * Send a message to the specified queue (the AWS SQS queue URL is resolved based on the queueName for each message )
      * @param messageBody - A string message body
      * @param messageAttributes - A MessageAttributeMap
+     * @param queueName - The queue name
      */
-    public async sendMessage(messageBody: string, messageAttributes?: MessageBodyAttributeMap): Promise<PromiseResult<SendMessageResult, AWSError>> {
+    private async sendMessage(messageBody: string, queueName: string, messageAttributes?: MessageBodyAttributeMap): Promise<PromiseResult<SendMessageResult, AWSError>> {
         // Get the queue URL for the provided queue name
-        const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: this.config.queueName })
+        const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: queueName })
         .promise();
 
         const params = {
@@ -62,7 +79,7 @@ class SQService {
      */
     public async getMessages(): Promise<PromiseResult<ReceiveMessageResult, AWSError>> {
         // Get the queue URL for the provided queue name
-        const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: this.config.queueName })
+        const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: this.config.queueName[0] })
         .promise();
 
         // Get the messages from the queue

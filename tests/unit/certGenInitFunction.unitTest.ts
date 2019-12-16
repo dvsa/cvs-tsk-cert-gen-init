@@ -2,6 +2,8 @@ import {certGenInit} from "../../src/functions/certGenInit";
 import mockContext from "aws-lambda-mock-context";
 import {SQService} from "../../src/services/SQService";
 import {StreamService} from "../../src/services/StreamService";
+import {Utils} from "../../src/utils/Utils";
+
 
 describe("certGenInit Function", () => {
   const ctx = mockContext();
@@ -11,12 +13,19 @@ describe("certGenInit Function", () => {
   });
   describe("with good event", () => {
     it("should invoke SQS service with correct params", async () => {
-      const sendMessage = jest.fn().mockResolvedValue("Success");
-      SQService.prototype.sendMessage = sendMessage;
+      const sendCertGenMessage = jest.fn();
+      SQService.prototype.sendCertGenMessage = sendCertGenMessage;
+      SQService.prototype.sendUpdateStatusMessage = jest.fn();
       StreamService.getTestResultStream = jest.fn().mockReturnValue([{test: "thing"}]);
+      Utils.filterCertificateGenerationRecords = jest.fn().mockReturnValue([{test: "thing"}]);
+
+      try {
       await certGenInit({}, ctx, () => { return; });
-      expect(sendMessage).toHaveBeenCalledWith(JSON.stringify({test: "thing"}));
-      expect(sendMessage).toHaveBeenCalledTimes(1);
+      } catch (e) {
+        console.log(e);
+      }
+      expect(sendCertGenMessage).toHaveBeenCalledWith(JSON.stringify({test: "thing"}));
+      expect(sendCertGenMessage).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -24,7 +33,11 @@ describe("certGenInit Function", () => {
     it("should throw error", async () => {
       StreamService.getTestResultStream = jest.fn().mockReturnValue([{}]);
       const myError = new Error("It Broke!");
-      SQService.prototype.sendMessage = jest.fn().mockRejectedValue(myError);
+      SQService.prototype.sendCertGenMessage = jest.fn().mockRejectedValue(myError);
+      SQService.prototype.sendUpdateStatusMessage = jest.fn();
+      StreamService.getTestResultStream = jest.fn().mockReturnValue([{test: "thing"}]);
+      Utils.filterCertificateGenerationRecords = jest.fn().mockReturnValue([{test: "thing"}]);
+
 
       expect.assertions(1);
       try {
