@@ -1,12 +1,12 @@
 import {Utils} from "../../src/utils/Utils";
 import {StreamService} from "../../src/services/StreamService";
-import * as record from "../resources/stream-event.json";
+import * as event from "../resources/stream-event.json";
 
 describe("utils", () => {
     let expandedRecords: any[];
 
     beforeEach(() => {
-        expandedRecords = StreamService.getTestResultStream(record);
+        expandedRecords = StreamService.getTestResultStream(event);
     });
 
     afterAll(() => {

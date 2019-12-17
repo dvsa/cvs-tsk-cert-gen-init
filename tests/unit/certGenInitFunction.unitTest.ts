@@ -29,17 +29,21 @@ describe("certGenInit Function", () => {
     it("should invoke SQS service with correct params", async () => {
       const sendCertGenMessage = jest.fn();
       SQService.prototype.sendCertGenMessage = sendCertGenMessage;
-      SQService.prototype.sendUpdateStatusMessage = jest.fn();
-      StreamService.getTestResultStream = jest.fn().mockReturnValue([{test: "thing"}]);
-      Utils.filterCertificateGenerationRecords = jest.fn().mockReturnValue([{test: "thing"}]);
+      const sendUpdateStatusMessage = jest.fn();
+      SQService.prototype.sendUpdateStatusMessage = sendUpdateStatusMessage;
+      StreamService.getTestResultStream = jest.fn().mockReturnValue([{TestRecord: "updateStatusMessage"}]);
+      Utils.filterCertificateGenerationRecords = jest.fn().mockReturnValue([{TestRecord: "certGenMessage"}]);
 
       try {
       await certGenInit({}, ctx, () => { return; });
       } catch (e) {
         console.log(e);
       }
-      expect(sendCertGenMessage).toHaveBeenCalledWith(JSON.stringify({test: "thing"}));
+      expect(sendCertGenMessage).toHaveBeenCalledWith(JSON.stringify({TestRecord: "certGenMessage"}));
       expect(sendCertGenMessage).toHaveBeenCalledTimes(1);
+
+      expect(sendUpdateStatusMessage).toHaveBeenCalledWith(JSON.stringify({TestRecord: "updateStatusMessage"}));
+      expect(sendUpdateStatusMessage).toHaveBeenCalledTimes(1);
     });
   });
 
