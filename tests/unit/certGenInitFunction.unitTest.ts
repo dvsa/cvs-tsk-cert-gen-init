@@ -11,6 +11,20 @@ describe("certGenInit Function", () => {
     jest.restoreAllMocks();
     jest.resetModuleRegistry();
   });
+
+  describe("if the event is undefined", () => {
+    it("should return undefined", async () => {
+
+      expect.assertions(1);
+      try {
+        const result = await certGenInit(undefined, ctx, () => { return; });
+        expect(result).toBe(undefined);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  });
+
   describe("with good event", () => {
     it("should invoke SQS service with correct params", async () => {
       const sendCertGenMessage = jest.fn();
