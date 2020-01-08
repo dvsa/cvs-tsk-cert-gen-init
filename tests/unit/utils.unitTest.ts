@@ -23,6 +23,14 @@ describe("utils", () => {
             expect(filteredRecords.length).toBe(0);
         });
 
+        it("should filter correctly abandoned testTypes", async () => {
+            console.log(expandedRecords[0]);
+            expandedRecords[0].testTypes.testResult = "abandoned";
+            const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
+
+            expect(filteredRecords.length).toBe(0);
+        });
+
         it("should not remove events which have to generate a certificate", async () => {
             const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
 
