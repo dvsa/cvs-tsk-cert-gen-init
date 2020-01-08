@@ -101,11 +101,11 @@ describe("cert-gen-init", () => {
         const sqService: SQService = Injector.resolve<SQService>(SQService, [SQMockClient]);
         context("when adding a record to the queue", () => {
             context("and the queue does not exist", () => {
-                it("should successfully add the records to the queue", () => {
+                it("should successfully add the records to the certGen queue", () => {
                     const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
 
                     processedEvent.forEach(async (record: any) => {
-                        sendMessagePromises.push(sqService.sendMessage(JSON.stringify(record)));
+                        sendMessagePromises.push(sqService.sendCertGenMessage(JSON.stringify(record)));
                     });
 
                     expect.assertions(2);
@@ -127,14 +127,14 @@ describe("cert-gen-init", () => {
             });
 
             context("and the queue does exist", () => {
-                it("should successfully add the records to the queue", () => {
+                it("should successfully add the records to the certGen queue", () => {
                     const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
                     sqService.sqsClient.createQueue({
                         QueueName: "cert-gen-q"
                     });
 
                     processedEvent.forEach(async (record: any) => {
-                        sendMessagePromises.push(sqService.sendMessage(JSON.stringify(record)));
+                        sendMessagePromises.push(sqService.sendCertGenMessage(JSON.stringify(record)));
                     });
 
                     expect.assertions(0);
@@ -143,6 +143,24 @@ describe("cert-gen-init", () => {
                         console.error(error);
                         expect(error).toBeFalsy();
                     });
+                });
+
+                it("should successfully add the records to the UpdateStatus queue", () => {
+                    const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
+                    sqService.sqsClient.createQueue({
+                        QueueName: "update-status-q"
+                    });
+
+                    processedEvent.forEach(async (record: any) => {
+                        sendMessagePromises.push(sqService.sendUpdateStatusMessage(JSON.stringify(record)));
+                    });
+
+                    expect.assertions(0);
+                    return Promise.all(sendMessagePromises)
+                        .catch((error: AWSError) => {
+                            console.error(error);
+                            expect(error).toBeFalsy();
+                        });
                 });
 
                 it("should successfully read the added records from the queue", () => {

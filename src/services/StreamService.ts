@@ -9,8 +9,7 @@ class StreamService {
 
     /**
      * Extract INSERT events from the DynamoDB Stream, convert them
-     * to a JS object, filter by testStatus, certificateNumber
-     * and expand the test results into multiple ones for each test type
+     * to a JS object and expand the test results into multiple ones for each test type
      * Example:
      * Convert
      * test-result
@@ -37,22 +36,7 @@ class StreamService {
             }
         });
 
-        const expandedRecords: any[] = StreamService.expandRecords(records);
-
-        return expandedRecords
-        .filter((record: any) => { // Filter by testStatus
-            return record.testStatus === "submitted";
-        })
-        .filter((record: any) => { // Filter by testResult (abandoned tests are not allowed)
-            return (record.testTypes.testResult === "pass" || record.testTypes.testResult === "fail" || record.testTypes.testResult === "prs");
-        })
-        .filter((record: any) => { // Filter by testTypeClassification
-            if (record.testTypes && record.testTypes.testTypeClassification) {
-                return record.testTypes.testTypeClassification === "Annual With Certificate";
-            }
-
-            return false;
-        });
+        return StreamService.expandRecords(records);
     }
 
     /**

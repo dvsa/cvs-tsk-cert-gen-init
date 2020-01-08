@@ -4,6 +4,7 @@ import {SQService} from "../services/SQService";
 import {PromiseResult} from "aws-sdk/lib/request";
 import {SendMessageResult} from "aws-sdk/clients/sqs";
 import {StreamService} from "../services/StreamService";
+import {Utils} from "../utils/Utils";
 
 /**
  * λ function to process a DynamoDB stream of test results into a queue for certificate generation.
@@ -18,15 +19,19 @@ const certGenInit: Handler = async (event: any, context?: Context, callback?: Ca
     }
 
     // Convert the received event into a readable array of filtered test results
-    const records: any[] = StreamService.getTestResultStream(event);
+    const expandedRecords: any[] = StreamService.getTestResultStream(event);
+    const certGenFilteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
 
     // Instantiate the Simple Queue Service
     const sqService: SQService = new SQService(new SQS());
     const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
 
-    // Add each record to the queue
-    records.forEach(async (record: any) => {
-        sendMessagePromises.push(sqService.sendMessage(JSON.stringify(record)));
+    certGenFilteredRecords.forEach((record: any) => {
+        sendMessagePromises.push(sqService.sendCertGenMessage(JSON.stringify(record)));
+    });
+
+    expandedRecords.forEach((record: any) => {
+        sendMessagePromises.push(sqService.sendUpdateStatusMessage(JSON.stringify(record)));
     });
 
     return Promise.all(sendMessagePromises)
