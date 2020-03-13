@@ -28,6 +28,7 @@ class StreamService {
     public static getTestResultStream(event: any) {
         // Create from a test result with multiple test types, multiple test result with one test type each
         const records: any[] = event.Records.filter((record: DynamoDBRecord) => { // Retrieve "INSERT" events
+            console.log("DYNAMO EVENT", record);
             return record.eventName === "INSERT";
         })
         .map((record: DynamoDBRecord) => { // Convert to JS object
