@@ -89,8 +89,16 @@ describe("cert-gen-init", () => {
             euVehicleCategory: "m1"
         }];
 
-        context("when fetching test result stream", () => {
+        context("when fetching test result stream and the eventName is INSERT", () => {
             it("should result in an array of filtered js objects", () => {
+                processedEvent = StreamService.getTestResultStream(event);
+                expect(processedEvent).toEqual(expectedResult);
+            });
+        });
+
+        context("when fetching test result stream and the eventName is MODIFY", () => {
+            it("should result in an array of filtered js objects", () => {
+                event.Records[0].eventName = "MODIFY";
                 processedEvent = StreamService.getTestResultStream(event);
                 expect(processedEvent).toEqual(expectedResult);
             });
