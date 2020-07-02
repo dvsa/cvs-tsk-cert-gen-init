@@ -3,6 +3,7 @@ import mockContext from "aws-lambda-mock-context";
 import {SQService} from "../../src/services/SQService";
 import {StreamService} from "../../src/services/StreamService";
 import {Utils} from "../../src/utils/Utils";
+import { AWSError } from "aws-sdk";
 
 
 describe("certGenInit Function", () => {
@@ -48,9 +49,28 @@ describe("certGenInit Function", () => {
   });
 
   describe("when SQService throws error", () => {
-    it("should throw error", async () => {
+    it("should throw error if code is not InvalidParameterValue", async () => {
       StreamService.getTestResultStream = jest.fn().mockReturnValue([{}]);
-      const myError = new Error("It Broke!");
+      const myError = new Error("It Broke!") as AWSError;
+      myError.code = "SomeError";
+      SQService.prototype.sendCertGenMessage = jest.fn().mockRejectedValue(myError);
+      SQService.prototype.sendUpdateStatusMessage = jest.fn();
+      StreamService.getTestResultStream = jest.fn().mockReturnValue([{test: "thing"}]);
+      Utils.filterCertificateGenerationRecords = jest.fn().mockReturnValue([{test: "thing"}]);
+
+
+      expect.assertions(2);
+      try {
+        await certGenInit({}, ctx, () => { return; });
+      } catch (e) {
+        expect(e.message).toEqual(myError.message);
+        expect(e.code).toEqual(myError.code);
+      }
+    });
+    it("should not throw error if code is InvalidParameterValue", async () => {
+      StreamService.getTestResultStream = jest.fn().mockReturnValue([{}]);
+      const myError = new Error("It Broke!") as AWSError;
+      myError.code = "InvalidParameterValue";
       SQService.prototype.sendCertGenMessage = jest.fn().mockRejectedValue(myError);
       SQService.prototype.sendUpdateStatusMessage = jest.fn();
       StreamService.getTestResultStream = jest.fn().mockReturnValue([{test: "thing"}]);
@@ -59,9 +79,10 @@ describe("certGenInit Function", () => {
 
       expect.assertions(1);
       try {
-        await certGenInit({}, ctx, () => { return; });
+        const result = await certGenInit({}, ctx, () => { return; });
+        expect(result).toBe({});
       } catch (e) {
-        expect(e.message).toEqual(myError.message);
+        console.log(e);
       }
     });
   });

@@ -12,11 +12,8 @@ import { Utils } from "../utils/Utils";
  * @param context - λ Context
  * @param callback - callback function
  */
-const certGenInit: Handler = async (
-  event: any,
-  context?: Context,
-  callback?: Callback
-): Promise<void | Array<PromiseResult<SendMessageResult, AWSError>>> => {
+const certGenInit: Handler = async (event: any, context?: Context, callback?: Callback):
+Promise<void | Array<PromiseResult<SendMessageResult, AWSError>>> => {
   if (!event) {
     console.error("ERROR: event is not defined.");
     return;
@@ -30,41 +27,30 @@ const certGenInit: Handler = async (
 
   // Instantiate the Simple Queue Service
   const sqService: SQService = new SQService(new SQS());
-  const sendMessagePromises: Array<Promise<
-    PromiseResult<SendMessageResult, AWSError>
-  >> = [];
+  const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
 
   certGenFilteredRecords.forEach((record: any) => {
-    try {
       sendMessagePromises.push(
         sqService.sendCertGenMessage(JSON.stringify(record))
       );
-    } catch (error) {
-      console.log("failed on forEach for certGenFilteredRecords");
-      console.log(record);
-      throw error;
-    }
   });
 
   expandedRecords.forEach((record: any) => {
-    try {
       sendMessagePromises.push(
         sqService.sendUpdateStatusMessage(JSON.stringify(record))
       );
-    } catch (error) {
-      console.log("failed on forEach for expandedRecords");
-      console.log(record);
-      throw error;
-    }
+
   });
 
   return Promise.all(sendMessagePromises).catch((error: AWSError) => {
     console.error(error);
     console.log("expandedRecords");
-    console.log(expandedRecords);
+    console.log(JSON.stringify(expandedRecords));
     console.log("certGenFilteredRecords");
-    console.log(certGenFilteredRecords);
-    throw error;
+    console.log(JSON.stringify(certGenFilteredRecords));
+    if (error.code !== "InvalidParameterValue") {
+        throw error;
+    }
   });
 };
 
