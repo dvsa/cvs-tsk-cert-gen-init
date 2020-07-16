@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node_modules/serverless/bin/serverless invoke local -f main --path tests/resources/stream-event.json",
     "start:docker": "docker-compose -f docker-compose.yml up -d",
-    "build": "node_modules/typescript/bin/tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
-    "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",
+    "build": "node_modules/typescript/bin/tsc --rootDir ./ --outDir .build --sourceMap false",
+    "build:dev": "node_modules/typescript/bin/tsc",
+    "build:pipeline": "npm run build:copy",
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" \\)  | cpio -pdm .build",
     "build:docker": "docker-compose -f docker-compose.yml up -d --build",
     "test": "BRANCH=local SLS_DEBUG=* AWS_XRAY_CONTEXT_MISSING=LOG_ERROR jest --testMatch=\"**/*.unitTest.ts\" --coverage",
