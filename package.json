@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Certificate generation initiation task",
   "main": "handler.js",
+  "engines": {
+    "node": "10.18.1"
+  },
   "scripts": {
     "start": "node_modules/serverless/bin/serverless invoke local -f main --path tests/resources/stream-event.json",
     "start:docker": "docker-compose -f docker-compose.yml up -d",
@@ -17,7 +20,7 @@
     "prepush": "npm test && npm run tslint",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
     "coverage": "BRANCH=local SLS_DEBUG=* jest --testMatch=\"**/*.*Test.ts\" --coverage",
-    "audit-dep": "npm audit",
+    "audit-dep": "npm audit --json | audit-filter --nsp-config=.nsprc --audit=-",
     "package": "mkdir ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "tools-setup": "echo 'nothing to do'"
   },
@@ -54,6 +57,7 @@
     "@types/jest": "^24.0.21",
     "@types/jest-plugin-context": "^2.9.2",
     "@types/node": "^10.17.3",
+    "audit-filter": "^0.5.0",
     "aws-lambda-mock-context": "^3.2.1",
     "husky": "^3.0.9",
     "jest": "^24.9.0",
