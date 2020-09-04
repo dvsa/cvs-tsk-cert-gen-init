@@ -49,7 +49,7 @@ describe("certGenInit Function", () => {
   });
 
   describe("when SQService throws error", () => {
-    it("should throw error if code is not InvalidParameterValue", async () => {
+    it("should throw error", async () => {
       StreamService.getTestResultStream = jest.fn().mockReturnValue([{}]);
       const myError = new Error("It Broke!") as AWSError;
       myError.code = "SomeError";
@@ -65,24 +65,6 @@ describe("certGenInit Function", () => {
       } catch (e) {
         expect(e.message).toEqual(myError.message);
         expect(e.code).toEqual(myError.code);
-      }
-    });
-    it("should not throw error if code is InvalidParameterValue", async () => {
-      StreamService.getTestResultStream = jest.fn().mockReturnValue([{}]);
-      const myError = new Error("It Broke!") as AWSError;
-      myError.code = "InvalidParameterValue";
-      SQService.prototype.sendCertGenMessage = jest.fn().mockRejectedValue(myError);
-      SQService.prototype.sendUpdateStatusMessage = jest.fn();
-      StreamService.getTestResultStream = jest.fn().mockReturnValue([{test: "thing"}]);
-      Utils.filterCertificateGenerationRecords = jest.fn().mockReturnValue([{test: "thing"}]);
-
-
-      expect.assertions(1);
-      try {
-        const result = await certGenInit({}, ctx, () => { return; });
-        expect(result).toBe({});
-      } catch (e) {
-        console.log(e);
       }
     });
   });
