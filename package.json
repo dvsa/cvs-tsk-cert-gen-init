@@ -17,7 +17,7 @@
     "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand --passWithNoTests",
     "tslint": "tslint --project .",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
-    "prepush": "npm run coverage",
+    "prepush": "npm run coverage && npm run build",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
     "coverage": "npm t -- --runInBand --coverage",
     "audit:check": "npm audit --json | audit-filter --nsp-config=.nsprc --audit=-",
@@ -85,7 +85,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": " npm run security-checks && npm run tslint && npm run build",
+      "pre-commit": " npm run security-checks && npm audit && npm run tslint",
       "pre-push": "npm run prepush"
     }
   }
