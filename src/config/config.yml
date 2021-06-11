@@ -13,3 +13,11 @@ sqs:
     queueName:
       - cert-gen-${BRANCH}-queue
       - update-status-${BRANCH}-queue
+  localstack:
+    params:
+      apiVersion: "2012-11-05"
+      region: eu-west-1
+      endpoint: http://${LOCALSTACK_HOSTNAME}:4566
+    queueName:
+      - cert-gen-${BRANCH}-queue
+      - update-status-${BRANCH}-queue

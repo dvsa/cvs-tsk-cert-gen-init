@@ -4,7 +4,7 @@ import {Configuration} from "../utils/Configuration";
 import {PromiseResult} from "aws-sdk/lib/request";
 import {AWSError, config as AWSConfig} from "aws-sdk";
 /* tslint:disable */
-const AWSXRay = require("aws-xray-sdk");
+// const AWSXRay = require("aws-xray-sdk");
 /* tslint:enable */
 
 /**
@@ -21,17 +21,22 @@ class SQService {
      */
     constructor(sqsClient: SQS) {
         const config: any = Configuration.getInstance().getConfig();
-        this.sqsClient = AWSXRay.captureAWSClient(sqsClient);
+        // this.sqsClient = AWSXRay.captureAWSClient(sqsClient);
+        this.sqsClient = sqsClient;
 
         if (!config.sqs) {
             throw new Error("SQS config is not defined in the config file.");
         }
 
         // Not defining BRANCH will default to local
-        const env: string = (!process.env.BRANCH || process.env.BRANCH === "local") ? "local" : "remote";
+        const env: string = (!process.env.BRANCH || process.env.BRANCH === "local") ? "local" : process.env.BRANCH;
         this.config = config.sqs[env];
+        console.log("this.config");
+        console.log(this.config);
 
         AWSConfig.sqs = this.config.params;
+        console.log("AWSConfig.sqs");
+        console.log(AWSConfig.sqs);
     }
 
     /**
@@ -39,6 +44,8 @@ class SQService {
      * @param messageBody
      */
     public sendCertGenMessage(messageBody: string) {
+        console.log("this.config.queueName[0]");
+        console.log(this.config.queueName[0]);
         return this.sendMessage(messageBody, this.config.queueName[0]);
     }
 
@@ -47,6 +54,8 @@ class SQService {
      * @param messageBody
      */
     public sendUpdateStatusMessage(messageBody: string) {
+        console.log("this.config.queueName[1]");
+        console.log(this.config.queueName[1]);
         return this.sendMessage(messageBody, this.config.queueName[1]);
     }
 
