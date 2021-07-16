@@ -12,8 +12,11 @@ import { Utils } from "../utils/Utils";
  * @param context - λ Context
  * @param callback - callback function
  */
-const certGenInit: Handler = async (event: any, context?: Context, callback?: Callback):
-Promise<void | Array<PromiseResult<SendMessageResult, AWSError>>> => {
+const certGenInit: Handler = async (
+  event: any,
+  context?: Context,
+  callback?: Callback
+): Promise<void | Array<PromiseResult<SendMessageResult, AWSError>>> => {
   if (!event) {
     console.error("ERROR: event is not defined.");
     return;
@@ -21,25 +24,25 @@ Promise<void | Array<PromiseResult<SendMessageResult, AWSError>>> => {
 
   // Convert the received event into a readable array of filtered test results
   const expandedRecords: any[] = StreamService.getTestResultStream(event);
-  const certGenFilteredRecords: any[] = Utils.filterCertificateGenerationRecords(
-    expandedRecords
-  );
+  const certGenFilteredRecords: any[] =
+    Utils.filterCertificateGenerationRecords(expandedRecords);
 
   // Instantiate the Simple Queue Service
   const sqService: SQService = new SQService(new SQS());
-  const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
+  const sendMessagePromises: Array<
+    Promise<PromiseResult<SendMessageResult, AWSError>>
+  > = [];
 
   certGenFilteredRecords.forEach((record: any) => {
-      sendMessagePromises.push(
-        sqService.sendCertGenMessage(JSON.stringify(record))
-      );
+    sendMessagePromises.push(
+      sqService.sendCertGenMessage(JSON.stringify(record))
+    );
   });
 
   expandedRecords.forEach((record: any) => {
-      sendMessagePromises.push(
-        sqService.sendUpdateStatusMessage(JSON.stringify(record))
-      );
-
+    sendMessagePromises.push(
+      sqService.sendUpdateStatusMessage(JSON.stringify(record))
+    );
   });
 
   return Promise.all(sendMessagePromises).catch((error: AWSError) => {
@@ -49,7 +52,7 @@ Promise<void | Array<PromiseResult<SendMessageResult, AWSError>>> => {
     console.log("certGenFilteredRecords");
     console.log(JSON.stringify(certGenFilteredRecords));
     if (error.code !== "InvalidParameterValue") {
-        throw error;
+      throw error;
     }
   });
 };

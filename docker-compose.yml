@@ -4,7 +4,7 @@ services:
     container_name: cvs-tsk-cert-gen-init
     build: .
     depends_on:
-     - sqs
+      - sqs
     links:
       - sqs
     environment:
@@ -15,5 +15,5 @@ services:
     volumes:
       - ./sqs.conf:/opt/custom/elasticmq.conf
     ports:
-    - "9324:9324"
-    - "9325:9325" # Web interface
+      - "9324:9324"
+      - "9325:9325" # Web interface
