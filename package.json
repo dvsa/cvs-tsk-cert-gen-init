@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "serverless invoke local -f main --path tests/resources/stream-event.json",
+    "start:localstack": "BRANCH=localstack serverless invoke local -f main --path tests/resources/stream-event.json",
     "start:docker": "docker-compose -f docker-compose.yml up -d",
     "build": "node_modules/typescript/bin/tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
     "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",

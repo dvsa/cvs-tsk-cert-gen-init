@@ -40,3 +40,4 @@ coverage/**
 .scannerwork/**
 report.json
 .reports
+localstack*

@@ -10,4 +10,7 @@ if (isOffline) {
     };
 }
 
+console.log("AWSConfig.credentials");
+console.log(AWSConfig.credentials);
+
 export {certGenInit as handler};
