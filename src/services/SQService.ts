@@ -24,23 +24,7 @@ class SQService {
         // // this.sqsClient = AWSXRay.captureAWSClient(sqsClient);
         this.sqsClient = sqsClient;
         console.log("sqsClient");
-        console.log(JSON.stringify(sqsClient));
-
-        // if (!config.sqs) {
-        //     throw new Error("SQS config is not defined in the config file.");
-        // }
-
-        // // Not defining BRANCH will default to local
-        // const env: string = (!process.env.BRANCH || process.env.BRANCH === "local") ? "local" : process.env.BRANCH;
-        // this.config = config.sqs[env];
-        // console.log("this.config");
-        // console.log(this.config);
-
-        // AWSConfig.sqs = this.config.params;
-        // console.log('process.env')
-        // console.log(process.env)
-        // console.log("AWSConfig.sqs");
-        // console.log(AWSConfig.sqs);
+        console.log(sqsClient);
     }
 
     /**
@@ -48,9 +32,6 @@ class SQService {
      * @param messageBody
      */
     public sendCertGenMessage(messageBody: string) {
-        // console.log("this.config.queueName[0]");
-        // console.log(this.config.queueName[0]);
-        // return this.sendMessage(messageBody, this.config.queueName[0]);
         return this.sendMessage(messageBody, "cert-gen-localstack-queue");
     }
 
@@ -59,8 +40,6 @@ class SQService {
      * @param messageBody
      */
     public sendUpdateStatusMessage(messageBody: string) {
-        console.log("this.config.queueName[1]");
-        console.log(this.config.queueName[1]);
         return this.sendMessage(messageBody, "update-status-localstack-queue");
     }
 
@@ -72,14 +51,14 @@ class SQService {
      */
     private async sendMessage(messageBody: string, queueName: string, messageAttributes?: MessageBodyAttributeMap): Promise<PromiseResult<SendMessageResult, AWSError>> {
         // Get the queue URL for the provided queue name
+        console.log({queueName});
         const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: queueName })
         .promise();
         console.log("sendMessage() queueUrlResult");
-        console.trace();
         console.log(queueUrlResult);
 
         const params = {
-            QueueUrl: queueUrlResult.QueueUrl,
+            QueueUrl: `http://${process.env.LOCALSTACK_HOSTNAME}:4566`,
             MessageBody: messageBody
         };
 
@@ -96,7 +75,7 @@ class SQService {
      */
     public async getMessages(): Promise<PromiseResult<ReceiveMessageResult, AWSError>> {
         // Get the queue URL for the provided queue name
-        const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: this.config.queueName[0] })
+        const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: "cert-gen-localstack-queue" })
         .promise();
         console.log("getMessages(): queueUrlResult");
         console.log(queueUrlResult);
