@@ -15,9 +15,12 @@ sqs:
       - update-status-${BRANCH}-queue
   localstack:
     params:
-      apiVersion: "2012-11-05"
-      region: eu-west-1
       endpoint: http://${LOCALSTACK_HOSTNAME}:4566
+      accessKeyId: mock_access_key
+      secretAccessKey: mock_secret_key
+      region: eu-west-1
+      QueueUrl: http://${LOCALSTACK_HOSTNAME}:4566/000000000000/cvs-localstack-cert-gen-queue
+      apiVersion: 2012-11-05
     queueName:
       - cert-gen-${BRANCH}-queue
       - update-status-${BRANCH}-queue

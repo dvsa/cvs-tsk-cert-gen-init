@@ -26,7 +26,16 @@ Promise<void | Array<PromiseResult<SendMessageResult, AWSError>>> => {
   );
 
   // Instantiate the Simple Queue Service
-  const sqService: SQService = new SQService(new SQS());
+  // const sqService: SQService = new SQService(new SQS());
+  console.log(process.env);
+  console.log("process.env");
+  const sqsQueue = new SQS({
+    endpoint: `http://${process.env.LOCALSTACK_HOSTNAME}:4566`,
+    region: "eu-west-1",
+    apiVersion: "2012-11-05"
+
+  });
+  const sqService: SQService = new SQService(sqsQueue);
   const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
 
   certGenFilteredRecords.forEach((record: any) => {

@@ -20,23 +20,27 @@ class SQService {
      * @param sqsClient - The Simple Queue Service client
      */
     constructor(sqsClient: SQS) {
-        const config: any = Configuration.getInstance().getConfig();
-        // this.sqsClient = AWSXRay.captureAWSClient(sqsClient);
+        // const config: any = Configuration.getInstance().getConfig();
+        // // this.sqsClient = AWSXRay.captureAWSClient(sqsClient);
         this.sqsClient = sqsClient;
+        console.log("sqsClient");
+        console.log(JSON.stringify(sqsClient));
 
-        if (!config.sqs) {
-            throw new Error("SQS config is not defined in the config file.");
-        }
+        // if (!config.sqs) {
+        //     throw new Error("SQS config is not defined in the config file.");
+        // }
 
-        // Not defining BRANCH will default to local
-        const env: string = (!process.env.BRANCH || process.env.BRANCH === "local") ? "local" : process.env.BRANCH;
-        this.config = config.sqs[env];
-        console.log("this.config");
-        console.log(this.config);
+        // // Not defining BRANCH will default to local
+        // const env: string = (!process.env.BRANCH || process.env.BRANCH === "local") ? "local" : process.env.BRANCH;
+        // this.config = config.sqs[env];
+        // console.log("this.config");
+        // console.log(this.config);
 
-        AWSConfig.sqs = this.config.params;
-        console.log("AWSConfig.sqs");
-        console.log(AWSConfig.sqs);
+        // AWSConfig.sqs = this.config.params;
+        // console.log('process.env')
+        // console.log(process.env)
+        // console.log("AWSConfig.sqs");
+        // console.log(AWSConfig.sqs);
     }
 
     /**
@@ -44,9 +48,10 @@ class SQService {
      * @param messageBody
      */
     public sendCertGenMessage(messageBody: string) {
-        console.log("this.config.queueName[0]");
-        console.log(this.config.queueName[0]);
-        return this.sendMessage(messageBody, this.config.queueName[0]);
+        // console.log("this.config.queueName[0]");
+        // console.log(this.config.queueName[0]);
+        // return this.sendMessage(messageBody, this.config.queueName[0]);
+        return this.sendMessage(messageBody, "cert-gen-localstack-queue");
     }
 
     /**
@@ -56,7 +61,7 @@ class SQService {
     public sendUpdateStatusMessage(messageBody: string) {
         console.log("this.config.queueName[1]");
         console.log(this.config.queueName[1]);
-        return this.sendMessage(messageBody, this.config.queueName[1]);
+        return this.sendMessage(messageBody, "update-status-localstack-queue");
     }
 
     /**
@@ -69,6 +74,9 @@ class SQService {
         // Get the queue URL for the provided queue name
         const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: queueName })
         .promise();
+        console.log("sendMessage() queueUrlResult");
+        console.trace();
+        console.log(queueUrlResult);
 
         const params = {
             QueueUrl: queueUrlResult.QueueUrl,
@@ -90,6 +98,8 @@ class SQService {
         // Get the queue URL for the provided queue name
         const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: this.config.queueName[0] })
         .promise();
+        console.log("getMessages(): queueUrlResult");
+        console.log(queueUrlResult);
 
         // Get the messages from the queue
         return this.sqsClient.receiveMessage({ QueueUrl: queueUrlResult.QueueUrl! })
