@@ -81,7 +81,7 @@ class SQService {
         console.log(queueUrlResult);
 
         // Get the messages from the queue
-        return this.sqsClient.receiveMessage({ QueueUrl: queueUrlResult.QueueUrl! })
+        return this.sqsClient.receiveMessage({ QueueUrl: `http://${process.env.LOCALSTACK_HOSTNAME}:4566` })
         .promise();
     }
 
