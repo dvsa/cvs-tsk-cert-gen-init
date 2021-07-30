@@ -51,11 +51,15 @@ class SQService {
      */
     private async sendMessage(messageBody: string, queueName: string, messageAttributes?: MessageBodyAttributeMap): Promise<PromiseResult<SendMessageResult, AWSError>> {
         // Get the queue URL for the provided queue name
+        console.log('queueName');
         console.log({queueName});
-        const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: queueName })
-        .promise();
-        console.log("sendMessage() queueUrlResult");
-        console.log(queueUrlResult);
+        // const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: queueName })
+        // .promise();
+        // console.log("sendMessage() queueUrlResult");
+        // console.log(queueUrlResult);
+
+        console.log('process.env.LOCALSTACK_HOSTNAME in sendMessage()')
+        console.log(process.env.LOCALSTACK_HOSTNAME)
 
         const params = {
             QueueUrl: `http://${process.env.LOCALSTACK_HOSTNAME}:4566`,
@@ -63,8 +67,10 @@ class SQService {
         };
 
         if (messageAttributes) {
-            Object.assign(params, { MessageAttributes: messageAttributes });
+            Object.assign({}, params, { MessageAttributes: messageAttributes });
         }
+        console.log('params after message attributes')
+        console.log(params)
 
         // Send a message to the queue
         return this.sqsClient.sendMessage(params as SQS.Types.SendMessageRequest).promise();
@@ -75,12 +81,14 @@ class SQService {
      */
     public async getMessages(): Promise<PromiseResult<ReceiveMessageResult, AWSError>> {
         // Get the queue URL for the provided queue name
-        const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: "cert-gen-localstack-queue" })
-        .promise();
-        console.log("getMessages(): queueUrlResult");
-        console.log(queueUrlResult);
+        // const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: "cert-gen-localstack-queue" })
+        // .promise();
+        // console.log("getMessages(): queueUrlResult");
+        // console.log(queueUrlResult);
 
         // Get the messages from the queue
+        console.log('process.env.LOCALSTACK_HOSTNAME in getMessages()')
+        console.log(process.env.LOCALSTACK_HOSTNAME)
         return this.sqsClient.receiveMessage({ QueueUrl: `http://${process.env.LOCALSTACK_HOSTNAME}:4566` })
         .promise();
     }
