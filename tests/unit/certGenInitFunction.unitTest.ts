@@ -1,10 +1,9 @@
-import {certGenInit} from "../../src/functions/certGenInit";
+import { certGenInit } from "../../src/functions/certGenInit";
 import mockContext from "aws-lambda-mock-context";
-import {SQService} from "../../src/services/SQService";
-import {StreamService} from "../../src/services/StreamService";
-import {Utils} from "../../src/utils/Utils";
+import { SQService } from "../../src/services/SQService";
+import { StreamService } from "../../src/services/StreamService";
+import { Utils } from "../../src/utils/Utils";
 import { AWSError } from "aws-sdk";
-
 
 describe("certGenInit Function", () => {
   const ctx = mockContext();
@@ -15,10 +14,11 @@ describe("certGenInit Function", () => {
 
   describe("if the event is undefined", () => {
     it("should return undefined", async () => {
-
       expect.assertions(1);
       try {
-        const result = await certGenInit(undefined, ctx, () => { return; });
+        const result = await certGenInit(undefined, ctx, () => {
+          return;
+        });
         expect(result).toBe(undefined);
       } catch (e) {
         console.log(e);
@@ -32,18 +32,28 @@ describe("certGenInit Function", () => {
       SQService.prototype.sendCertGenMessage = sendCertGenMessage;
       const sendUpdateStatusMessage = jest.fn();
       SQService.prototype.sendUpdateStatusMessage = sendUpdateStatusMessage;
-      StreamService.getTestResultStream = jest.fn().mockReturnValue([{TestRecord: "updateStatusMessage"}]);
-      Utils.filterCertificateGenerationRecords = jest.fn().mockReturnValue([{TestRecord: "certGenMessage"}]);
+      StreamService.getTestResultStream = jest
+        .fn()
+        .mockReturnValue([{ TestRecord: "updateStatusMessage" }]);
+      Utils.filterCertificateGenerationRecords = jest
+        .fn()
+        .mockReturnValue([{ TestRecord: "certGenMessage" }]);
 
       try {
-      await certGenInit({}, ctx, () => { return; });
+        await certGenInit({}, ctx, () => {
+          return;
+        });
       } catch (e) {
         console.log(e);
       }
-      expect(sendCertGenMessage).toHaveBeenCalledWith(JSON.stringify({TestRecord: "certGenMessage"}));
+      expect(sendCertGenMessage).toHaveBeenCalledWith(
+        JSON.stringify({ TestRecord: "certGenMessage" })
+      );
       expect(sendCertGenMessage).toHaveBeenCalledTimes(1);
 
-      expect(sendUpdateStatusMessage).toHaveBeenCalledWith(JSON.stringify({TestRecord: "updateStatusMessage"}));
+      expect(sendUpdateStatusMessage).toHaveBeenCalledWith(
+        JSON.stringify({ TestRecord: "updateStatusMessage" })
+      );
       expect(sendUpdateStatusMessage).toHaveBeenCalledTimes(1);
     });
   });
@@ -53,15 +63,22 @@ describe("certGenInit Function", () => {
       StreamService.getTestResultStream = jest.fn().mockReturnValue([{}]);
       const myError = new Error("It Broke!") as AWSError;
       myError.code = "SomeError";
-      SQService.prototype.sendCertGenMessage = jest.fn().mockRejectedValue(myError);
+      SQService.prototype.sendCertGenMessage = jest
+        .fn()
+        .mockRejectedValue(myError);
       SQService.prototype.sendUpdateStatusMessage = jest.fn();
-      StreamService.getTestResultStream = jest.fn().mockReturnValue([{test: "thing"}]);
-      Utils.filterCertificateGenerationRecords = jest.fn().mockReturnValue([{test: "thing"}]);
-
+      StreamService.getTestResultStream = jest
+        .fn()
+        .mockReturnValue([{ test: "thing" }]);
+      Utils.filterCertificateGenerationRecords = jest
+        .fn()
+        .mockReturnValue([{ test: "thing" }]);
 
       expect.assertions(2);
       try {
-        await certGenInit({}, ctx, () => { return; });
+        await certGenInit({}, ctx, () => {
+          return;
+        });
       } catch (e) {
         expect(e.message).toEqual(myError.message);
         expect(e.code).toEqual(myError.code);
@@ -71,15 +88,22 @@ describe("certGenInit Function", () => {
       StreamService.getTestResultStream = jest.fn().mockReturnValue([{}]);
       const myError = new Error("It Broke!") as AWSError;
       myError.code = "InvalidParameterValue";
-      SQService.prototype.sendCertGenMessage = jest.fn().mockRejectedValue(myError);
+      SQService.prototype.sendCertGenMessage = jest
+        .fn()
+        .mockRejectedValue(myError);
       SQService.prototype.sendUpdateStatusMessage = jest.fn();
-      StreamService.getTestResultStream = jest.fn().mockReturnValue([{test: "thing"}]);
-      Utils.filterCertificateGenerationRecords = jest.fn().mockReturnValue([{test: "thing"}]);
-
+      StreamService.getTestResultStream = jest
+        .fn()
+        .mockReturnValue([{ test: "thing" }]);
+      Utils.filterCertificateGenerationRecords = jest
+        .fn()
+        .mockReturnValue([{ test: "thing" }]);
 
       expect.assertions(1);
       try {
-        const result = await certGenInit({}, ctx, () => { return; });
+        const result = await certGenInit({}, ctx, () => {
+          return;
+        });
         expect(result).toBe({});
       } catch (e) {
         console.log(e);
