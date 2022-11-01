@@ -106,16 +106,25 @@ describe("cert-gen-init", () => {
       }
     );
 
-    // context(
-    //   "when fetching test result stream and the eventName is MODIFY",
-    //   () => {
-    //     it("should result in an array of filtered js objects", () => {
-    //       event.Records[0].eventName = "MODIFY";
-    //       processedEvent = StreamService.getTestResultStream(event);
-    //       expect(processedEvent).toEqual(expectedResult);
-    //     });
-    //   }
-    // );
+    context(
+      "when fetching test result stream and the eventName is MODIFY",
+      () => {
+        it("shouldn't result in an array of filtered js objects when MODIFY_EVENTS is falsy", () => {
+          process.env.MODIFY_EVENTS = "";
+          event.Records[0].eventName = "MODIFY";
+          processedEvent = StreamService.getTestResultStream(event);
+          expect(processedEvent).toHaveLength(0);
+        });
+
+        it("should result in an array of filtered js objects when MODIFY_EVENTS is true", () => {
+          process.env.MODIFY_EVENTS = "true";
+          event.Records[0].eventName = "MODIFY";
+          processedEvent = StreamService.getTestResultStream(event);
+          expect(processedEvent).toHaveLength(1);
+          expect(processedEvent).toEqual(expectedResult);
+        });
+      }
+    );
   });
 
   context("SQService", () => {

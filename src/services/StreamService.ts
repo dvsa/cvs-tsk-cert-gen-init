@@ -28,7 +28,7 @@ class StreamService {
     // Create from a test result with multiple test types, multiple test result with one test type each
     const records: any[] = event.Records.filter((record: DynamoDBRecord) => {
       // Retrieve "INSERT" events
-      return record.eventName === "INSERT";
+      return record.eventName === "INSERT" || (record.eventName === "MODIFY" && process.env.MODIFY_EVENTS);
     }).map((record: DynamoDBRecord) => {
       // Convert to JS object
       if (record.dynamodb && record.dynamodb.NewImage) {
