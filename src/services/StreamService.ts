@@ -30,7 +30,7 @@ class StreamService {
       // Retrieve "INSERT" events
       return (
         record.eventName === "INSERT" ||
-        (record.eventName === "MODIFY" && process.env.MODIFY_EVENTS)
+        (record.eventName === "MODIFY" && process.env.PROCESS_MODIFY_EVENTS)
       );
     }).map((record: DynamoDBRecord) => {
       // Convert to JS object
