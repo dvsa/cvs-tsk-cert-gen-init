@@ -109,8 +109,8 @@ describe("cert-gen-init", () => {
     context(
       "when fetching test result stream and the eventName is MODIFY",
       () => {
-        it("shouldn't result in an array of filtered js objects when PROCESS_MODIFY_EVENTS is falsy", () => {
-          process.env.PROCESS_MODIFY_EVENTS = "";
+        it("shouldn't result in an array of filtered js objects when PROCESS_MODIFY_EVENTS is false", () => {
+          process.env.PROCESS_MODIFY_EVENTS = "false";
           event.Records[0].eventName = "MODIFY";
           processedEvent = StreamService.getTestResultStream(event);
           expect(processedEvent).toHaveLength(0);
@@ -122,6 +122,14 @@ describe("cert-gen-init", () => {
           processedEvent = StreamService.getTestResultStream(event);
           expect(processedEvent).toHaveLength(1);
           expect(processedEvent).toEqual(expectedResult);
+        });
+
+        it("should throw an error if PROCESS_MODIFY_EVENTS is not true or false", () => {
+          process.env.PROCESS_MODIFY_EVENTS = "";
+          event.Records[0].eventName = "MODIFY";
+          expect(() => {
+            StreamService.getTestResultStream(event);
+          }).toThrowError();
         });
       }
     );
