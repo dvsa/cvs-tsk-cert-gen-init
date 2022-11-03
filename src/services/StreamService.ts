@@ -28,7 +28,11 @@ class StreamService {
     // Create from a test result with multiple test types, multiple test result with one test type each
     const records: any[] = event.Records.filter((record: DynamoDBRecord) => {
       // Retrieve "INSERT" events
-      return record.eventName === "INSERT" || record.eventName === "MODIFY";
+      return (
+        record.eventName === "INSERT" ||
+        (record.eventName === "MODIFY" &&
+          StreamService.isProcessModifyEventsEnabled())
+      );
     }).map((record: DynamoDBRecord) => {
       // Convert to JS object
       if (record.dynamodb && record.dynamodb.NewImage) {
@@ -37,6 +41,22 @@ class StreamService {
     });
 
     return StreamService.expandRecords(records);
+  }
+
+  /**
+   * Returns true or false as a boolean based on PROCESS_MODIFY_EVENTS, if
+   * it is not a valid value then it should throw an error
+   */
+  private static isProcessModifyEventsEnabled(): boolean {
+    if (
+      process.env.PROCESS_MODIFY_EVENTS !== "true" &&
+      process.env.PROCESS_MODIFY_EVENTS !== "false"
+    ) {
+      throw Error(
+        "PROCESS_MODIFY_EVENTS environment variable must be true or false"
+      );
+    }
+    return process.env.PROCESS_MODIFY_EVENTS === "true";
   }
 
   /**
