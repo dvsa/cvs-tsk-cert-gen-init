@@ -18,7 +18,7 @@
     "test-i": "echo 'nothing to do'",
     "lint": "tslint --project .",
     "format": "prettier --write .",
-    "sonar-scanner": "sonar-scanner",
+    "sonar-scanner": "npm run test && sonar-scanner",
     "prepush": "npm run test && npm run build && npm run test-i",
     "security-checks": "git secrets --scan",
     "audit:check": "npm audit --json | audit-filter --nsp-config=.nsprc --audit=-",
@@ -77,7 +77,7 @@
     "typescript": "^3.9.7"
   },
   "jestSonar": {
-    "reportPath": ".reports",
+    "reportPath": "coverage",
     "reportFile": "test-report.xml",
     "indent": 4
   },
