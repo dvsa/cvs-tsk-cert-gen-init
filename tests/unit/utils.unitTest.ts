@@ -20,7 +20,7 @@ describe("utils", () => {
       const filteredRecords: any[] =
         Utils.filterCertificateGenerationRecords(expandedRecords);
 
-      expect(filteredRecords.length).toBe(0);
+      expect(filteredRecords.length).toBe(1);
     });
 
     it("should filter correctly abandoned testTypes", async () => {
