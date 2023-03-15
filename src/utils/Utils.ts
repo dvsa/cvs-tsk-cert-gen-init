@@ -10,7 +10,7 @@ export class Utils {
     return records
       .filter((record: any) => {
         // Filter by testStatus
-        return record.testStatus === "submitted";
+        return record.testStatus === "submitted" || record.testStatus === "cancelled";
       })
       .filter((record: any) => {
         // Filter by testResult (abandoned tests are not allowed)
