@@ -39,12 +39,6 @@ const certGenInit: Handler = async (
     );
   });
 
-  expandedRecords.forEach((record: any) => {
-    sendMessagePromises.push(
-      sqService.sendUpdateStatusMessage(JSON.stringify(record))
-    );
-  });
-
   return Promise.all(sendMessagePromises).catch((error: AWSError) => {
     console.error(error);
     console.log("expandedRecords");
