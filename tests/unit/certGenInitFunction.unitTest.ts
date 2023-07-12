@@ -71,7 +71,7 @@ describe("certGenInit Function", () => {
         await certGenInit({}, ctx, () => {
           return;
         });
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toEqual(myError.message);
         expect(e.code).toEqual(myError.code);
       }

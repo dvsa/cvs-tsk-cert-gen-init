@@ -74,7 +74,7 @@
     "ts-jest": "^26.4.4",
     "ts-node-register": "^1.0.0",
     "tslint": "^5.20.0",
-    "typescript": "^3.9.7"
+    "typescript": "^5.0.4"
   },
   "jestSonar": {
     "reportPath": "coverage",
