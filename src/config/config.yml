@@ -6,10 +6,8 @@ sqs:
       apiVersion: "2012-11-05"
     queueName:
       - cert-gen-q
-      - update-status-q
   remote:
     params:
       apiVersion: "2012-11-05"
     queueName:
       - cert-gen-${BRANCH}-queue
-      - update-status-${BRANCH}-queue

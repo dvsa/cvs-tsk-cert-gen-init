@@ -51,14 +51,6 @@ class SQService {
   }
 
   /**
-   * Send a message to update-status queue
-   * @param messageBody
-   */
-  public sendUpdateStatusMessage(messageBody: string) {
-    return this.sendMessage(messageBody, this.config.queueName[1]);
-  }
-
-  /**
    * Send a message to the specified queue (the AWS SQS queue URL is resolved based on the queueName for each message )
    * @param messageBody - A string message body
    * @param messageAttributes - A MessageAttributeMap

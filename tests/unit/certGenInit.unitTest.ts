@@ -190,27 +190,6 @@ describe("cert-gen-init", () => {
           });
         });
 
-        it("should successfully add the records to the UpdateStatus queue", () => {
-          const sendMessagePromises: Array<
-            Promise<PromiseResult<SendMessageResult, AWSError>>
-          > = [];
-          sqService.sqsClient.createQueue({
-            QueueName: "update-status-q",
-          });
-
-          processedEvent.forEach(async (record: any) => {
-            sendMessagePromises.push(
-              sqService.sendUpdateStatusMessage(JSON.stringify(record))
-            );
-          });
-
-          expect.assertions(0);
-          return Promise.all(sendMessagePromises).catch((error: AWSError) => {
-            console.error(error);
-            expect(error).toBeFalsy();
-          });
-        });
-
         it("should successfully read the added records from the queue", () => {
           return sqService
             .getMessages()

@@ -30,8 +30,6 @@ describe("certGenInit Function", () => {
     it("should invoke SQS service with correct params", async () => {
       const sendCertGenMessage = jest.fn();
       SQService.prototype.sendCertGenMessage = sendCertGenMessage;
-      const sendUpdateStatusMessage = jest.fn();
-      SQService.prototype.sendUpdateStatusMessage = sendUpdateStatusMessage;
       StreamService.getTestResultStream = jest
         .fn()
         .mockReturnValue([{ TestRecord: "updateStatusMessage" }]);
@@ -50,11 +48,6 @@ describe("certGenInit Function", () => {
         JSON.stringify({ TestRecord: "certGenMessage" })
       );
       expect(sendCertGenMessage).toHaveBeenCalledTimes(1);
-
-      expect(sendUpdateStatusMessage).toHaveBeenCalledWith(
-        JSON.stringify({ TestRecord: "updateStatusMessage" })
-      );
-      expect(sendUpdateStatusMessage).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -66,7 +59,6 @@ describe("certGenInit Function", () => {
       SQService.prototype.sendCertGenMessage = jest
         .fn()
         .mockRejectedValue(myError);
-      SQService.prototype.sendUpdateStatusMessage = jest.fn();
       StreamService.getTestResultStream = jest
         .fn()
         .mockReturnValue([{ test: "thing" }]);
@@ -79,7 +71,7 @@ describe("certGenInit Function", () => {
         await certGenInit({}, ctx, () => {
           return;
         });
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toEqual(myError.message);
         expect(e.code).toEqual(myError.code);
       }
@@ -91,7 +83,6 @@ describe("certGenInit Function", () => {
       SQService.prototype.sendCertGenMessage = jest
         .fn()
         .mockRejectedValue(myError);
-      SQService.prototype.sendUpdateStatusMessage = jest.fn();
       StreamService.getTestResultStream = jest
         .fn()
         .mockReturnValue([{ test: "thing" }]);
