@@ -1,4 +1,4 @@
-import mockContext from "aws-lambda-mock-context";
+import { Context } from "aws-lambda";
 import { AWSError } from "aws-sdk";
 import { certGenInit } from "../../src/functions/certGenInit";
 import { SQService } from "../../src/services/SQService";
@@ -6,7 +6,7 @@ import { StreamService } from "../../src/services/StreamService";
 import { Utils } from "../../src/utils/Utils";
 
 describe("certGenInit Function", () => {
-  const ctx = mockContext();
+  const ctx = "" as unknown as Context;
   afterAll(() => {
     jest.restoreAllMocks();
     jest.resetModules();
