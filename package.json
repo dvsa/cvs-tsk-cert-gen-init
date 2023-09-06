@@ -4,7 +4,7 @@
   "description": "Certificate generation initiation task",
   "main": "handler.js",
   "engines": {
-    "node": "14.*"
+    "node": "18.*"
   },
   "scripts": {
     "start": "serverless invoke local -f main --path tests/resources/stream-event.json",
@@ -64,14 +64,14 @@
     "audit-filter": "^0.5.0",
     "aws-lambda-mock-context": "^3.2.1",
     "husky": "^3.0.9",
-    "jest": "^26.6.3",
+    "jest": "^29.6.4",
     "jest-plugin-context": "^2.9.0",
     "jest-sonar-reporter": "^2.0.0",
     "prettier": "^2.3.2",
     "serverless": "^2.19.0",
     "serverless-plugin-tracing": "^2.0.0",
     "serverless-plugin-typescript": "^2.1.2",
-    "ts-jest": "^26.4.4",
+    "ts-jest": "^29.1.1",
     "ts-node-register": "^1.0.0",
     "tslint": "^5.20.0",
     "typescript": "^5.0.4"
@@ -80,12 +80,6 @@
     "reportPath": "coverage",
     "reportFile": "test-report.xml",
     "indent": 4
-  },
-  "jest": {
-    "coverageDirectory": "./coverage",
-    "collectCoverage": true,
-    "testResultsProcessor": "jest-sonar-reporter",
-    "testURL": "http://localhost"
   },
   "husky": {
     "hooks": {
