@@ -1,5 +1,5 @@
-import { Utils } from "../../src/utils/Utils";
 import { StreamService } from "../../src/services/StreamService";
+import { Utils } from "../../src/utils/Utils";
 import * as event from "../resources/stream-event.json";
 
 describe("utils", () => {
@@ -11,7 +11,7 @@ describe("utils", () => {
 
   afterAll(() => {
     jest.restoreAllMocks();
-    jest.resetModuleRegistry();
+    jest.resetModules();
   });
 
   describe("when filtering dynamoDB streams events", () => {

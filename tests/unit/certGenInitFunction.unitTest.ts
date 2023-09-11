@@ -1,15 +1,15 @@
+import { Context } from "aws-lambda";
+import { AWSError } from "aws-sdk";
 import { certGenInit } from "../../src/functions/certGenInit";
-import mockContext from "aws-lambda-mock-context";
 import { SQService } from "../../src/services/SQService";
 import { StreamService } from "../../src/services/StreamService";
 import { Utils } from "../../src/utils/Utils";
-import { AWSError } from "aws-sdk";
 
 describe("certGenInit Function", () => {
-  const ctx = mockContext();
+  const ctx = "" as unknown as Context;
   afterAll(() => {
     jest.restoreAllMocks();
-    jest.resetModuleRegistry();
+    jest.resetModules();
   });
 
   describe("if the event is undefined", () => {
