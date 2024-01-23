@@ -24,8 +24,8 @@ export class Utils {
         // Filter by testTypeClassification
         if (record.testTypes && record.testTypes.testTypeClassification) {
           return (
-            record.testTypes.testTypeClassification ===
-            "Annual With Certificate"
+            record.testTypes.testTypeClassification === "Annual With Certificate" ||
+            record.testTypes.testTypeClassification === "IVA With Certificate" && record.testTypes.testResult === "fail"
           );
         }
 
