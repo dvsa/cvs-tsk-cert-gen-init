@@ -21,11 +21,13 @@ export class Utils {
         );
       })
       .filter((record: any) => {
-        // Filter by testTypeClassification
+        // Filter by testTypeClassification or testTypeClassification, testResult and ivaDefects present and populated
         if (record.testTypes && record.testTypes.testTypeClassification) {
           return (
             record.testTypes.testTypeClassification === "Annual With Certificate" ||
-            record.testTypes.testTypeClassification === "IVA With Certificate" && record.testTypes.testResult === "fail"
+            record.testTypes.testTypeClassification === "IVA With Certificate" &&
+            record.testTypes.testResult === "fail" &&
+            record.testTypes.ivaDefects && record.testTypes.ivaDefects.length > 0
           );
         }
 
