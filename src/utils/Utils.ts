@@ -29,7 +29,7 @@ export class Utils {
                 record.testTypes.testTypeClassification === "IVA With Certificate" &&
                 record.testTypes.testResult === "fail" &&
                 record.testTypes.ivaDefects && record.testTypes.ivaDefects.length > 0
-              )
+            )
           );
         }
 
