@@ -25,9 +25,11 @@ export class Utils {
         if (record.testTypes && record.testTypes.testTypeClassification) {
           return (
             record.testTypes.testTypeClassification === "Annual With Certificate" ||
-            record.testTypes.testTypeClassification === "IVA With Certificate" &&
-            record.testTypes.testResult === "fail" &&
-            record.testTypes.ivaDefects && record.testTypes.ivaDefects.length > 0
+            (
+                record.testTypes.testTypeClassification === "IVA With Certificate" &&
+                record.testTypes.testResult === "fail" &&
+                record.testTypes.ivaDefects && record.testTypes.ivaDefects.length > 0
+              )
           );
         }
 
