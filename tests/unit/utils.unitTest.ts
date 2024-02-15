@@ -47,16 +47,16 @@ describe("utils", () => {
       expect(filteredRecords.length).toBe(0);
     });
 
-    it("should filter correctly events that have IVA With Certificate, ivaDefects populated but not test result fail", () => {
+    it("should filter correctly events that have IVA With Certificate, requiredStandards populated but not test result fail", () => {
       expandedRecords[0].testTypes.testTypeClassification = "IVA With Certificate";
-      expandedRecords[0].testTypes.ivaDefects = [{}];
+      expandedRecords[0].testTypes.requiredStandards = [{}];
       expandedRecords[0].testTypes.testResult = "pass";
       const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
 
       expect(filteredRecords.length).toBe(0);
     });
 
-    it("should filter correctly events that have IVA With Certificate, test result fail but no ivaDefects", () => {
+    it("should filter correctly events that have IVA With Certificate, test result fail but no requiredStandards", () => {
         expandedRecords[0].testTypes.testTypeClassification = "IVA With Certificate";
         expandedRecords[0].testTypes.testResult = "fail";
         const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
@@ -64,41 +64,41 @@ describe("utils", () => {
         expect(filteredRecords.length).toBe(0);
     });
 
-    it("should filter correctly events that have IVA With Certificate, test result fail but empty ivaDefects", () => {
+    it("should filter correctly events that have IVA With Certificate, test result fail but empty requiredStandards", () => {
         expandedRecords[0].testTypes.testTypeClassification = "IVA With Certificate";
         expandedRecords[0].testTypes.testResult = "fail";
-        expandedRecords[0].testTypes.ivaDefects = [];
+        expandedRecords[0].testTypes.requiredStandards = [];
         const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
 
         expect(filteredRecords.length).toBe(0);
     });
 
-    it("should not remove events which have IVA With Certificate, ivaDefects and test result fail", () => {
+    it("should not remove events which have IVA With Certificate, requiredStandards and test result fail", () => {
       expandedRecords[0].testTypes.testTypeClassification = "IVA With Certificate";
       expandedRecords[0].testTypes.testResult = "fail";
-      expandedRecords[0].testTypes.ivaDefects = [{}];
+      expandedRecords[0].testTypes.requiredStandards = [{}];
       const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
 
       expect(filteredRecords).toEqual(expandedRecords);
     });
 
-    it("should not remove events which have Annual With Certificate, no ivaDefects and test result fail", () => {
+    it("should not remove events which have Annual With Certificate, no requiredStandards and test result fail", () => {
         expandedRecords[0].testTypes.testResult = "fail";
         const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
 
         expect(filteredRecords).toEqual(expandedRecords);
     });
 
-    it("should not remove events which have Annual With Certificate, empty ivaDefects and test result fail", () => {
-        expandedRecords[0].testTypes.ivaDefects = [];
+    it("should not remove events which have Annual With Certificate, empty requiredStandards and test result fail", () => {
+        expandedRecords[0].testTypes.requiredStandards = [];
         expandedRecords[0].testTypes.testResult = "fail";
         const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
 
         expect(filteredRecords).toEqual(expandedRecords);
     });
 
-    it("should not remove events which have Annual With Certificate, populated ivaDefects and test result fail", () => {
-        expandedRecords[0].testTypes.ivaDefects = [{}];
+    it("should not remove events which have Annual With Certificate, populated requiredStandards and test result fail", () => {
+        expandedRecords[0].testTypes.requiredStandards = [{}];
         expandedRecords[0].testTypes.testResult = "fail";
         const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
 
