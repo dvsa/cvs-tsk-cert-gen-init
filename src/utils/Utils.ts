@@ -21,15 +21,15 @@ export class Utils {
         );
       })
       .filter((record: any) => {
-        // Filter by testTypeClassification
-        if (record.testTypes && record.testTypes.testTypeClassification) {
-          return (
-            record.testTypes.testTypeClassification ===
-            "Annual With Certificate"
-          );
-        }
+        // Filter by testTypeClassification or testTypeClassification, testResult and requiredStandards present and populated
+        const testTypes = record.testTypes;
 
-        return false;
+        const isAnnualWithCertificate = testTypes?.testTypeClassification === "Annual With Certificate";
+        const isIvaWithCertificate = testTypes?.testTypeClassification === "IVA With Certificate";
+        const isTestResultFail = testTypes?.testResult === "fail";
+        const hasNonEmptyRequiredStandards = !!(testTypes?.requiredStandards?.length);
+
+        return isAnnualWithCertificate || (isIvaWithCertificate && isTestResultFail && hasNonEmptyRequiredStandards);
       });
   }
 }
