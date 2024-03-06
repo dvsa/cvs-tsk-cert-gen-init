@@ -24,15 +24,27 @@ export class Utils {
         // Filter by testTypeClassification or testTypeClassification, testResult and requiredStandards present and populated
         const testTypes = record.testTypes;
 
-        const { testTypeClassification, testResult, requiredStandards } = record.testTypes;
+        const { testTypeClassification, testResult, requiredStandards } =
+          record.testTypes;
         const isTestResultFail = testResult === "fail";
-        const hasNonEmptyRequiredStandards = !!(requiredStandards?.length);
+        const hasNonEmptyRequiredStandards = !!requiredStandards?.length;
 
-        const isAnnualWithCertificate = testTypeClassification === "Annual With Certificate";
-        const isIvaWithCertificate = testTypeClassification === "IVA With Certificate" && isTestResultFail && hasNonEmptyRequiredStandards;
-        const isMsvaWithCertificate = testTypeClassification === "MSVA With Certificate" && isTestResultFail && hasNonEmptyRequiredStandards;
+        const isAnnualWithCertificate =
+          testTypeClassification === "Annual With Certificate";
+        const isIvaWithCertificate =
+          testTypeClassification === "IVA With Certificate" &&
+          isTestResultFail &&
+          hasNonEmptyRequiredStandards;
+        const isMsvaWithCertificate =
+          testTypeClassification === "MSVA With Certificate" &&
+          isTestResultFail &&
+          hasNonEmptyRequiredStandards;
 
-        return isAnnualWithCertificate || isIvaWithCertificate || isMsvaWithCertificate;
+        return (
+          isAnnualWithCertificate ||
+          isIvaWithCertificate ||
+          isMsvaWithCertificate
+        );
       });
   }
 }
