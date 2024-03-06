@@ -22,8 +22,6 @@ export class Utils {
       })
       .filter((record: any) => {
         // Filter by testTypeClassification or testTypeClassification, testResult and requiredStandards present and populated
-        const testTypes = record.testTypes;
-
         const { testTypeClassification, testResult, requiredStandards } =
           record.testTypes;
         const isTestResultFail = testResult === "fail";
