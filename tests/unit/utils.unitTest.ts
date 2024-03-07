@@ -48,61 +48,115 @@ describe("utils", () => {
     });
 
     it("should filter correctly events that have IVA With Certificate, requiredStandards populated but not test result fail", () => {
-      expandedRecords[0].testTypes.testTypeClassification = "IVA With Certificate";
+      expandedRecords[0].testTypes.testTypeClassification =
+        "IVA With Certificate";
       expandedRecords[0].testTypes.requiredStandards = [{}];
       expandedRecords[0].testTypes.testResult = "pass";
-      const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
+      const filteredRecords: any[] =
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
       expect(filteredRecords.length).toBe(0);
     });
 
     it("should filter correctly events that have IVA With Certificate, test result fail but no requiredStandards", () => {
-        expandedRecords[0].testTypes.testTypeClassification = "IVA With Certificate";
-        expandedRecords[0].testTypes.testResult = "fail";
-        const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
+      expandedRecords[0].testTypes.testTypeClassification =
+        "IVA With Certificate";
+      expandedRecords[0].testTypes.testResult = "fail";
+      const filteredRecords: any[] =
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
-        expect(filteredRecords.length).toBe(0);
+      expect(filteredRecords.length).toBe(0);
     });
 
     it("should filter correctly events that have IVA With Certificate, test result fail but empty requiredStandards", () => {
-        expandedRecords[0].testTypes.testTypeClassification = "IVA With Certificate";
-        expandedRecords[0].testTypes.testResult = "fail";
-        expandedRecords[0].testTypes.requiredStandards = [];
-        const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
+      expandedRecords[0].testTypes.testTypeClassification =
+        "IVA With Certificate";
+      expandedRecords[0].testTypes.testResult = "fail";
+      expandedRecords[0].testTypes.requiredStandards = [];
+      const filteredRecords: any[] =
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
-        expect(filteredRecords.length).toBe(0);
+      expect(filteredRecords.length).toBe(0);
     });
 
     it("should not remove events which have IVA With Certificate, requiredStandards and test result fail", () => {
-      expandedRecords[0].testTypes.testTypeClassification = "IVA With Certificate";
+      expandedRecords[0].testTypes.testTypeClassification =
+        "IVA With Certificate";
       expandedRecords[0].testTypes.testResult = "fail";
       expandedRecords[0].testTypes.requiredStandards = [{}];
-      const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
+      const filteredRecords: any[] =
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
       expect(filteredRecords).toEqual(expandedRecords);
     });
 
     it("should not remove events which have Annual With Certificate, no requiredStandards and test result fail", () => {
-        expandedRecords[0].testTypes.testResult = "fail";
-        const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
+      expandedRecords[0].testTypes.testResult = "fail";
+      const filteredRecords: any[] =
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
-        expect(filteredRecords).toEqual(expandedRecords);
+      expect(filteredRecords).toEqual(expandedRecords);
     });
 
     it("should not remove events which have Annual With Certificate, empty requiredStandards and test result fail", () => {
-        expandedRecords[0].testTypes.requiredStandards = [];
-        expandedRecords[0].testTypes.testResult = "fail";
-        const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
+      expandedRecords[0].testTypes.requiredStandards = [];
+      expandedRecords[0].testTypes.testResult = "fail";
+      const filteredRecords: any[] =
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
-        expect(filteredRecords).toEqual(expandedRecords);
+      expect(filteredRecords).toEqual(expandedRecords);
     });
 
     it("should not remove events which have Annual With Certificate, populated requiredStandards and test result fail", () => {
-        expandedRecords[0].testTypes.requiredStandards = [{}];
-        expandedRecords[0].testTypes.testResult = "fail";
-        const filteredRecords: any[] = Utils.filterCertificateGenerationRecords(expandedRecords);
+      expandedRecords[0].testTypes.requiredStandards = [{}];
+      expandedRecords[0].testTypes.testResult = "fail";
+      const filteredRecords: any[] =
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
-        expect(filteredRecords).toEqual(expandedRecords);
+      expect(filteredRecords).toEqual(expandedRecords);
+    });
+
+    it("should filter correctly events that have MSVA With Certificate, requiredStandards populated but not test result fail", () => {
+      expandedRecords[0].testTypes.testTypeClassification =
+          "MSVA With Certificate";
+      expandedRecords[0].testTypes.requiredStandards = [{}];
+      expandedRecords[0].testTypes.testResult = "pass";
+      const filteredRecords: any[] =
+          Utils.filterCertificateGenerationRecords(expandedRecords);
+
+      expect(filteredRecords.length).toBe(0);
+    });
+
+    it("should filter correctly events that have MSVA With Certificate, test result fail but no requiredStandards", () => {
+      expandedRecords[0].testTypes.testTypeClassification =
+          "MSVA With Certificate";
+      expandedRecords[0].testTypes.testResult = "fail";
+      const filteredRecords: any[] =
+          Utils.filterCertificateGenerationRecords(expandedRecords);
+
+      expect(filteredRecords.length).toBe(0);
+    });
+
+    it("should filter correctly events that have MSVA With Certificate, test result fail but empty requiredStandards", () => {
+      expandedRecords[0].testTypes.testTypeClassification =
+          "MSVA With Certificate";
+      expandedRecords[0].testTypes.testResult = "fail";
+      expandedRecords[0].testTypes.requiredStandards = [];
+      const filteredRecords: any[] =
+          Utils.filterCertificateGenerationRecords(expandedRecords);
+
+      expect(filteredRecords.length).toBe(0);
+    });
+
+    it("should not remove events which have MSVA With Certificate, requiredStandards and test result fail", () => {
+      expandedRecords[0].testTypes.testTypeClassification =
+          "MSVA With Certificate";
+      expandedRecords[0].testTypes.testResult = "fail";
+      expandedRecords[0].testTypes.requiredStandards = [{}];
+      const filteredRecords: any[] =
+          Utils.filterCertificateGenerationRecords(expandedRecords);
+
+      expect(filteredRecords).toEqual(expandedRecords);
     });
   });
 });

@@ -45,12 +45,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.CVS_MGMT_AWS_ROLE }}
           aws-region: ${{ secrets.DVSA_AWS_REGION }}
-          role-session-name: 'cvs-tsk-cert-gen-init'
+          role-session-name: "cvs-tsk-cert-gen-init"
       - uses: aws-actions/aws-secretsmanager-get-secrets@v1
         with:
           secret-ids: sonarqube-gha

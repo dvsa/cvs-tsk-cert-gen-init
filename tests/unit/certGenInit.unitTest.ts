@@ -6,7 +6,7 @@ import { PromiseResult } from "aws-sdk/lib/request";
 import { ReceiveMessageResult, SendMessageResult } from "aws-sdk/clients/sqs";
 import { AWSError } from "aws-sdk";
 import event from "../resources/stream-event.json";
-import {Configuration} from "../../src/utils/Configuration";
+import { Configuration } from "../../src/utils/Configuration";
 
 describe("cert-gen-init", () => {
   let processedEvent: any;
@@ -208,14 +208,16 @@ describe("cert-gen-init", () => {
 
         it("should log an error when SQS config is not defined", () => {
           const logSpy = jest.spyOn(console, "error");
-          Configuration.prototype.getConfig = jest.fn().mockReturnValue({sqs: undefined});
+          Configuration.prototype.getConfig = jest
+            .fn()
+            .mockReturnValue({ sqs: undefined });
 
           try {
-            Injector.resolve<SQService>(SQService, [
-              SQMockClient,
-            ]);
+            Injector.resolve<SQService>(SQService, [SQMockClient]);
             expect(logSpy).toHaveBeenCalledTimes(1);
-            expect(logSpy).toHaveBeenCalledWith("SQS config is not defined in the config file.");
+            expect(logSpy).toHaveBeenCalledWith(
+              "SQS config is not defined in the config file."
+            );
           } catch (error) {
             // do nothing
           }
