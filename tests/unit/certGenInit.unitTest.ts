@@ -2,11 +2,21 @@ import { Injector } from "../../src/models/injector/Injector";
 import { SQService } from "../../src/services/SQService";
 import { SQMockClient } from "../models/SQMockClient";
 import { StreamService } from "../../src/services/StreamService";
-import { PromiseResult } from "aws-sdk/lib/request";
-import { ReceiveMessageResult, SendMessageResult } from "aws-sdk/clients/sqs";
-import { AWSError } from "aws-sdk";
 import event from "../resources/stream-event.json";
 import { Configuration } from "../../src/utils/Configuration";
+import {
+  GetQueueUrlCommandOutput,
+  MessageAttributeValue,
+  ReceiveMessageCommandOutput,
+  SendMessageCommandInput,
+  SendMessageCommandOutput,
+  SQSClient,
+  GetQueueUrlCommand,
+  SendMessageCommand,
+  ReceiveMessageCommand,
+  CreateQueueCommand,
+  DeleteQueueCommand
+} from "@aws-sdk/client-sqs";
 
 describe("cert-gen-init", () => {
   let processedEvent: any;
@@ -144,7 +154,7 @@ describe("cert-gen-init", () => {
       context("and the queue does not exist", () => {
         it("should successfully add the records to the certGen queue", () => {
           const sendMessagePromises: Array<
-            Promise<PromiseResult<SendMessageResult, AWSError>>
+            Promise<any| SendMessageCommandOutput>
           > = [];
 
           processedEvent.forEach(async (record: any) => {
@@ -154,7 +164,7 @@ describe("cert-gen-init", () => {
           });
 
           expect.assertions(2);
-          return Promise.all(sendMessagePromises).catch((error: AWSError) => {
+          return Promise.all(sendMessagePromises).catch((error: any) => {
             expect(error).toBeInstanceOf(Error);
             expect(error.message).toEqual("Queue cert-gen-q was not found.");
           });
@@ -162,7 +172,7 @@ describe("cert-gen-init", () => {
 
         it("should fail to read any records from the queue", () => {
           expect.assertions(2);
-          return sqService.getMessages().catch((error: AWSError) => {
+          return sqService.getMessages().catch((error: any) => {
             expect(error).toBeInstanceOf(Error);
             expect(error.message).toEqual("Queue cert-gen-q was not found.");
           });
@@ -172,11 +182,11 @@ describe("cert-gen-init", () => {
       context("and the queue does exist", () => {
         it("should successfully add the records to the certGen queue", () => {
           const sendMessagePromises: Array<
-            Promise<PromiseResult<SendMessageResult, AWSError>>
+            Promise<any>
           > = [];
-          sqService.sqsClient.createQueue({
+          sqService.sqsClient.send(new CreateQueueCommand({
             QueueName: "cert-gen-q",
-          });
+          }));
 
           processedEvent.forEach(async (record: any) => {
             sendMessagePromises.push(
@@ -185,7 +195,7 @@ describe("cert-gen-init", () => {
           });
 
           expect.assertions(0);
-          return Promise.all(sendMessagePromises).catch((error: AWSError) => {
+          return Promise.all(sendMessagePromises).catch((error: any) => {
             console.error(error);
             expect(error).toBeFalsy();
           });
@@ -194,15 +204,15 @@ describe("cert-gen-init", () => {
         it("should successfully read the added records from the queue", () => {
           return sqService
             .getMessages()
-            .then((messages: ReceiveMessageResult) => {
+            .then((messages: ReceiveMessageCommandOutput) => {
               expect(
                 messages.Messages!.map((message) =>
                   JSON.parse(message.Body as string)
                 )
               ).toEqual(processedEvent);
-              sqService.sqsClient.deleteQueue({
+              sqService.sqsClient.send(new DeleteQueueCommand({
                 QueueUrl: "sqs://queue/cert-gen-q",
-              });
+              }));
             });
         });
 

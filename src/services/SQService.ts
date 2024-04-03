@@ -1,13 +1,22 @@
-import SQS, {
-  GetQueueUrlResult,
-  MessageBodyAttributeMap,
-  ReceiveMessageResult,
-  SendMessageResult,
-} from "aws-sdk/clients/sqs";
+
+import { ServiceException } from "@smithy/smithy-client";
+
+import {
+  GetQueueUrlCommandOutput,
+  MessageAttributeValue,
+  ReceiveMessageCommandOutput,
+  SendMessageCommandInput,
+  SendMessageCommandOutput,
+  SQSClient,
+  GetQueueUrlCommand,
+  SendMessageCommand,
+  ReceiveMessageCommand
+} from "@aws-sdk/client-sqs";
+
 import { Service } from "../models/injector/ServiceDecorator";
 import { Configuration } from "../utils/Configuration";
-import { PromiseResult } from "aws-sdk/lib/request";
-import { AWSError, config as AWSConfig } from "aws-sdk";
+// import { PromiseResult } from "aws-sdk/lib/request";
+import { config as AWSConfig } from "aws-sdk";
 /* tslint:disable */
 const AWSXRay = require("aws-xray-sdk");
 /* tslint:enable */
@@ -17,16 +26,16 @@ const AWSXRay = require("aws-xray-sdk");
  */
 @Service()
 class SQService {
-  public readonly sqsClient: SQS;
+  public readonly sqsClient: SQSClient;
   private readonly config: any;
 
   /**
    * Constructor for the ActivityService class
    * @param sqsClient - The Simple Queue Service client
    */
-  constructor(sqsClient: SQS) {
+  constructor(sqsClient: SQSClient) {
     const config: any = Configuration.getInstance().getConfig();
-    this.sqsClient = AWSXRay.captureAWSClient(sqsClient);
+    this.sqsClient = AWSXRay.captureAWSv3Client(sqsClient);
 
     if (!config.sqs) {
       throw new Error("SQS config is not defined in the config file.");
@@ -59,12 +68,12 @@ class SQService {
   private async sendMessage(
     messageBody: string,
     queueName: string,
-    messageAttributes?: MessageBodyAttributeMap
-  ): Promise<PromiseResult<SendMessageResult, AWSError>> {
+    messageAttributes?: Record<string, MessageAttributeValue>
+  ): Promise<SendMessageCommandOutput | ServiceException> {
     // Get the queue URL for the provided queue name
-    const queueUrlResult: GetQueueUrlResult = await this.sqsClient
-      .getQueueUrl({ QueueName: queueName })
-      .promise();
+    const queueUrlResult: GetQueueUrlCommandOutput = await this.sqsClient
+      .send(new GetQueueUrlCommand({ QueueName: queueName }))
+      // .promise();
 
     const params = {
       QueueUrl: queueUrlResult.QueueUrl,
@@ -77,25 +86,26 @@ class SQService {
 
     // Send a message to the queue
     return this.sqsClient
-      .sendMessage(params as SQS.Types.SendMessageRequest)
-      .promise();
+      .send(new SendMessageCommand(params as SendMessageCommandInput))
+      // .sendMessage(params as SendMessageCommandInput)
+      // .promise();
   }
 
   /**
    * Get the messages in the queue
    */
-  public async getMessages(): Promise<
-    PromiseResult<ReceiveMessageResult, AWSError>
-  > {
+  public async getMessages(): Promise<ReceiveMessageCommandOutput | ServiceException> {
     // Get the queue URL for the provided queue name
-    const queueUrlResult: GetQueueUrlResult = await this.sqsClient
-      .getQueueUrl({ QueueName: this.config.queueName[0] })
-      .promise();
+    const queueUrlResult: GetQueueUrlCommandOutput = await this.sqsClient
+      .send(new GetQueueUrlCommand({ QueueName: this.config.queueName[0] }))
+      // .getQueueUrl({ QueueName: this.config.queueName[0] })
+      // .promise();
 
     // Get the messages from the queue
     return this.sqsClient
-      .receiveMessage({ QueueUrl: queueUrlResult.QueueUrl! })
-      .promise();
+    .send(new ReceiveMessageCommand({ QueueUrl: queueUrlResult.QueueUrl! }))
+      // .receiveMessage({ QueueUrl: queueUrlResult.QueueUrl! })
+      // .promise();
   }
 }
 
