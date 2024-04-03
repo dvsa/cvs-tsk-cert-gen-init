@@ -7,6 +7,7 @@ import { ReceiveMessageResult, SendMessageResult } from "aws-sdk/clients/sqs";
 import { AWSError } from "aws-sdk";
 import event from "../resources/stream-event.json";
 import { Configuration } from "../../src/utils/Configuration";
+import { ReceiveMessageCommandOutput, SQSServiceException, SendMessageCommand, SendMessageCommandOutput } from "@aws-sdk/client-sqs";
 
 describe("cert-gen-init", () => {
   let processedEvent: any;
@@ -144,7 +145,7 @@ describe("cert-gen-init", () => {
       context("and the queue does not exist", () => {
         it("should successfully add the records to the certGen queue", () => {
           const sendMessagePromises: Array<
-            Promise<PromiseResult<SendMessageResult, AWSError>>
+            Promise<SendMessageCommandOutput | SQSServiceException>
           > = [];
 
           processedEvent.forEach(async (record: any) => {
@@ -162,7 +163,7 @@ describe("cert-gen-init", () => {
 
         it("should fail to read any records from the queue", () => {
           expect.assertions(2);
-          return sqService.getMessages().catch((error: AWSError) => {
+          return sqService.getMessages().catch((error: any) => {
             expect(error).toBeInstanceOf(Error);
             expect(error.message).toEqual("Queue cert-gen-q was not found.");
           });
@@ -172,7 +173,7 @@ describe("cert-gen-init", () => {
       context("and the queue does exist", () => {
         it("should successfully add the records to the certGen queue", () => {
           const sendMessagePromises: Array<
-            Promise<PromiseResult<SendMessageResult, AWSError>>
+            Promise<SendMessageCommandOutput | SQSServiceException>
           > = [];
           sqService.sqsClient.createQueue({
             QueueName: "cert-gen-q",
@@ -185,7 +186,7 @@ describe("cert-gen-init", () => {
           });
 
           expect.assertions(0);
-          return Promise.all(sendMessagePromises).catch((error: AWSError) => {
+          return Promise.all(sendMessagePromises).catch((error: any) => {
             console.error(error);
             expect(error).toBeFalsy();
           });
@@ -194,7 +195,7 @@ describe("cert-gen-init", () => {
         it("should successfully read the added records from the queue", () => {
           return sqService
             .getMessages()
-            .then((messages: ReceiveMessageResult) => {
+            .then((messages: ReceiveMessageCommandOutput) => {
               expect(
                 messages.Messages!.map((message) =>
                   JSON.parse(message.Body as string)

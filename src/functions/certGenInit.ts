@@ -1,8 +1,6 @@
+import { SQS, SQSServiceException, SendMessageCommandOutput } from "@aws-sdk/client-sqs";
 import { Callback, Context, Handler } from "aws-lambda";
-import { AWSError, SQS } from "aws-sdk";
 import { SQService } from "../services/SQService";
-import { PromiseResult } from "aws-sdk/lib/request";
-import { SendMessageResult } from "aws-sdk/clients/sqs";
 import { StreamService } from "../services/StreamService";
 import { Utils } from "../utils/Utils";
 
@@ -16,7 +14,7 @@ const certGenInit: Handler = async (
   event: any,
   context?: Context,
   callback?: Callback
-): Promise<void | Array<PromiseResult<SendMessageResult, AWSError>>> => {
+): Promise<void | Array<SendMessageCommandOutput | SQSServiceException>> => {
   if (!event) {
     console.error("ERROR: event is not defined.");
     return;
@@ -30,7 +28,7 @@ const certGenInit: Handler = async (
   // Instantiate the Simple Queue Service
   const sqService: SQService = new SQService(new SQS());
   const sendMessagePromises: Array<
-    Promise<PromiseResult<SendMessageResult, AWSError>>
+    Promise<SendMessageCommandOutput | SQSServiceException>
   > = [];
 
   certGenFilteredRecords.forEach((record: any) => {
@@ -39,13 +37,13 @@ const certGenInit: Handler = async (
     );
   });
 
-  return Promise.all(sendMessagePromises).catch((error: AWSError) => {
+  return Promise.all(sendMessagePromises).catch((error: any) => {
     console.error(error);
     console.log("expandedRecords");
     console.log(JSON.stringify(expandedRecords));
     console.log("certGenFilteredRecords");
     console.log(JSON.stringify(certGenFilteredRecords));
-    if (error.code !== "InvalidParameterValue") {
+    if (error.message !== "InvalidParameterValue") {
       throw error;
     }
   });
