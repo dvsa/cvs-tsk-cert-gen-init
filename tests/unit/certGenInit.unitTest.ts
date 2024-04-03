@@ -2,7 +2,7 @@ import {
   CreateQueueCommand,
   DeleteQueueCommand,
   ReceiveMessageCommandOutput,
-  SendMessageCommandOutput
+  SendMessageCommandOutput,
 } from "@aws-sdk/client-sqs";
 import { Injector } from "../../src/models/injector/Injector";
 import { SQService } from "../../src/services/SQService";
