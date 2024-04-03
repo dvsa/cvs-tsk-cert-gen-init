@@ -1,16 +1,15 @@
-
 import { ServiceException } from "@smithy/smithy-client";
 
 import {
+  GetQueueUrlCommand,
   GetQueueUrlCommandOutput,
   MessageAttributeValue,
+  ReceiveMessageCommand,
   ReceiveMessageCommandOutput,
+  SQSClient,
+  SendMessageCommand,
   SendMessageCommandInput,
   SendMessageCommandOutput,
-  SQSClient,
-  GetQueueUrlCommand,
-  SendMessageCommand,
-  ReceiveMessageCommand
 } from "@aws-sdk/client-sqs";
 
 import { Service } from "../models/injector/ServiceDecorator";
@@ -71,9 +70,10 @@ class SQService {
     messageAttributes?: Record<string, MessageAttributeValue>
   ): Promise<SendMessageCommandOutput | ServiceException> {
     // Get the queue URL for the provided queue name
-    const queueUrlResult: GetQueueUrlCommandOutput = await this.sqsClient
-      .send(new GetQueueUrlCommand({ QueueName: queueName }))
-      // .promise();
+    const queueUrlResult: GetQueueUrlCommandOutput = await this.sqsClient.send(
+      new GetQueueUrlCommand({ QueueName: queueName })
+    );
+    // .promise();
 
     const params = {
       QueueUrl: queueUrlResult.QueueUrl,
@@ -85,27 +85,25 @@ class SQService {
     }
 
     // Send a message to the queue
-    return this.sqsClient
-      .send(new SendMessageCommand(params as SendMessageCommandInput))
-      // .sendMessage(params as SendMessageCommandInput)
-      // .promise();
+    return this.sqsClient.send(
+      new SendMessageCommand(params as SendMessageCommandInput)
+    );
   }
 
   /**
    * Get the messages in the queue
    */
-  public async getMessages(): Promise<ReceiveMessageCommandOutput | ServiceException> {
+  public async getMessages(): Promise<
+    ReceiveMessageCommandOutput | ServiceException
+  > {
     // Get the queue URL for the provided queue name
-    const queueUrlResult: GetQueueUrlCommandOutput = await this.sqsClient
-      .send(new GetQueueUrlCommand({ QueueName: this.config.queueName[0] }))
-      // .getQueueUrl({ QueueName: this.config.queueName[0] })
-      // .promise();
-
+    const queueUrlResult: GetQueueUrlCommandOutput = await this.sqsClient.send(
+      new GetQueueUrlCommand({ QueueName: this.config.queueName[0] })
+    );
     // Get the messages from the queue
-    return this.sqsClient
-    .send(new ReceiveMessageCommand({ QueueUrl: queueUrlResult.QueueUrl! }))
-      // .receiveMessage({ QueueUrl: queueUrlResult.QueueUrl! })
-      // .promise();
+    return this.sqsClient.send(
+      new ReceiveMessageCommand({ QueueUrl: queueUrlResult.QueueUrl! })
+    );
   }
 }
 

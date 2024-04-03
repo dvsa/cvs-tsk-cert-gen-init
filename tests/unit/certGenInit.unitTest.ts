@@ -1,22 +1,15 @@
+import {
+  CreateQueueCommand,
+  DeleteQueueCommand,
+  ReceiveMessageCommandOutput,
+  SendMessageCommandOutput
+} from "@aws-sdk/client-sqs";
 import { Injector } from "../../src/models/injector/Injector";
 import { SQService } from "../../src/services/SQService";
-import { SQMockClient } from "../models/SQMockClient";
 import { StreamService } from "../../src/services/StreamService";
-import event from "../resources/stream-event.json";
 import { Configuration } from "../../src/utils/Configuration";
-import {
-  GetQueueUrlCommandOutput,
-  MessageAttributeValue,
-  ReceiveMessageCommandOutput,
-  SendMessageCommandInput,
-  SendMessageCommandOutput,
-  SQSClient,
-  GetQueueUrlCommand,
-  SendMessageCommand,
-  ReceiveMessageCommand,
-  CreateQueueCommand,
-  DeleteQueueCommand
-} from "@aws-sdk/client-sqs";
+import { SQMockClient } from "../models/SQMockClient";
+import event from "../resources/stream-event.json";
 
 describe("cert-gen-init", () => {
   let processedEvent: any;
@@ -154,7 +147,7 @@ describe("cert-gen-init", () => {
       context("and the queue does not exist", () => {
         it("should successfully add the records to the certGen queue", () => {
           const sendMessagePromises: Array<
-            Promise<any| SendMessageCommandOutput>
+            Promise<any | SendMessageCommandOutput>
           > = [];
 
           processedEvent.forEach(async (record: any) => {
@@ -181,12 +174,12 @@ describe("cert-gen-init", () => {
 
       context("and the queue does exist", () => {
         it("should successfully add the records to the certGen queue", () => {
-          const sendMessagePromises: Array<
-            Promise<any>
-          > = [];
-          sqService.sqsClient.send(new CreateQueueCommand({
-            QueueName: "cert-gen-q",
-          }));
+          const sendMessagePromises: Array<Promise<any>> = [];
+          sqService.sqsClient.send(
+            new CreateQueueCommand({
+              QueueName: "cert-gen-q",
+            })
+          );
 
           processedEvent.forEach(async (record: any) => {
             sendMessagePromises.push(
@@ -210,9 +203,11 @@ describe("cert-gen-init", () => {
                   JSON.parse(message.Body as string)
                 )
               ).toEqual(processedEvent);
-              sqService.sqsClient.send(new DeleteQueueCommand({
-                QueueUrl: "sqs://queue/cert-gen-q",
-              }));
+              sqService.sqsClient.send(
+                new DeleteQueueCommand({
+                  QueueUrl: "sqs://queue/cert-gen-q",
+                })
+              );
             });
         });
 
