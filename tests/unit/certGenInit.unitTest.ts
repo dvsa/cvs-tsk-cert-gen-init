@@ -14,97 +14,97 @@ import { StreamService } from "../../src/services/StreamService";
 import { Configuration } from "../../src/utils/Configuration";
 import { SQMockClient } from "../models/SQMockClient";
 import event from "../resources/stream-event.json";
-import {mockClient} from 'aws-sdk-client-mock';
+import { mockClient } from "aws-sdk-client-mock";
+
+const expectedResult: any[] = [
+  {
+    testerStaffId: "1",
+    testStartTimestamp: "2019-01-21T10:36:33.987Z",
+    odometerReadingUnits: "kilometres",
+    order: {
+      current: 1,
+      total: 1,
+    },
+    testEndTimestamp: "2019-01-21T10:37:33.987Z",
+    testStatus: "submitted",
+    testTypes: {
+      testTypeClassification: "Annual With Certificate",
+      prohibitionIssued: false,
+      certificateNumber: "1234",
+      testCode: "aas",
+      lastUpdatedAt: "2019-02-21T12:06:29.194Z",
+      additionalCommentsForAbandon: "none",
+      numberOfSeatbeltsFitted: 2,
+      testTypeEndTimestamp: "2019-01-14T10:36:33.987Z",
+      reasonForAbandoning: "none",
+      lastSeatbeltInstallationCheckDate: "2019-01-14",
+      createdAt: "2019-02-21T12:06:29.194Z",
+      testTypeId: "1",
+      testTypeStartTimestamp: "2019-01-14T10:36:33.987Z",
+      testTypeName: "Annual test",
+      seatbeltInstallationCheckDate: true,
+      additionalNotesRecorded: "VEHICLE FRONT REGISTRATION PLATE MISSING",
+      defects: [
+        {
+          additionalInformation: {
+            location: {
+              axleNumber: null,
+              horizontal: null,
+              lateral: null,
+              longitudinal: "front",
+              rowNumber: null,
+              seatNumber: null,
+              vertical: null,
+            },
+            notes: "None",
+          },
+          deficiencyCategory: "major",
+          deficiencyId: "a",
+          deficiencyRef: "1.1.a",
+          deficiencySubId: null,
+          deficiencyText: "missing.",
+          imDescription: "Registration Plate",
+          imNumber: 1,
+          itemDescription: "A registration plate:",
+          itemNumber: 1,
+          prs: false,
+          stdForProhibition: false,
+        },
+      ],
+      name: "Annual test",
+      certificateLink: "http://dvsagov.co.uk",
+      testResult: "fail",
+    },
+    vehicleClass: {
+      code: "2",
+      description: "over 200cc or with a sidecar",
+    },
+    testResultId: "1",
+    vehicleSize: "small",
+    vin: "XMGDE02FS0H012345",
+    testStationName: "Rowe, Wunsch and Wisoky",
+    vehicleId: "JY58FPP",
+    countryOfRegistration: "united kingdom",
+    vehicleType: "psv",
+    preparerId: "ak4434",
+    preparerName: "Durrell Vehicles Limited",
+    odometerReading: 100000,
+    vehicleConfiguration: "rigid",
+    testStationType: "gvts",
+    reasonForCancellation: "none",
+    testerName: "Dorel",
+    vrm: "JY58FPP",
+    testStationPNumber: "87-1369569",
+    numberOfSeats: 45,
+    testerEmailAddress: "dorel.popescu@dvsagov.uk",
+    euVehicleCategory: "m1",
+  },
+];
 
 describe("cert-gen-init", () => {
   let processedEvent: any;
 
   context("StreamService", () => {
-    const expectedResult: any[] = [
-      {
-        testerStaffId: "1",
-        testStartTimestamp: "2019-01-21T10:36:33.987Z",
-        odometerReadingUnits: "kilometres",
-        order: {
-          current: 1,
-          total: 1,
-        },
-        testEndTimestamp: "2019-01-21T10:37:33.987Z",
-        testStatus: "submitted",
-        testTypes: {
-          testTypeClassification: "Annual With Certificate",
-          prohibitionIssued: false,
-          certificateNumber: "1234",
-          testCode: "aas",
-          lastUpdatedAt: "2019-02-21T12:06:29.194Z",
-          additionalCommentsForAbandon: "none",
-          numberOfSeatbeltsFitted: 2,
-          testTypeEndTimestamp: "2019-01-14T10:36:33.987Z",
-          reasonForAbandoning: "none",
-          lastSeatbeltInstallationCheckDate: "2019-01-14",
-          createdAt: "2019-02-21T12:06:29.194Z",
-          testTypeId: "1",
-          testTypeStartTimestamp: "2019-01-14T10:36:33.987Z",
-          testTypeName: "Annual test",
-          seatbeltInstallationCheckDate: true,
-          additionalNotesRecorded: "VEHICLE FRONT REGISTRATION PLATE MISSING",
-          defects: [
-            {
-              additionalInformation: {
-                location: {
-                  axleNumber: null,
-                  horizontal: null,
-                  lateral: null,
-                  longitudinal: "front",
-                  rowNumber: null,
-                  seatNumber: null,
-                  vertical: null,
-                },
-                notes: "None",
-              },
-              deficiencyCategory: "major",
-              deficiencyId: "a",
-              deficiencyRef: "1.1.a",
-              deficiencySubId: null,
-              deficiencyText: "missing.",
-              imDescription: "Registration Plate",
-              imNumber: 1,
-              itemDescription: "A registration plate:",
-              itemNumber: 1,
-              prs: false,
-              stdForProhibition: false,
-            },
-          ],
-          name: "Annual test",
-          certificateLink: "http://dvsagov.co.uk",
-          testResult: "fail",
-        },
-        vehicleClass: {
-          code: "2",
-          description: "over 200cc or with a sidecar",
-        },
-        testResultId: "1",
-        vehicleSize: "small",
-        vin: "XMGDE02FS0H012345",
-        testStationName: "Rowe, Wunsch and Wisoky",
-        vehicleId: "JY58FPP",
-        countryOfRegistration: "united kingdom",
-        vehicleType: "psv",
-        preparerId: "ak4434",
-        preparerName: "Durrell Vehicles Limited",
-        odometerReading: 100000,
-        vehicleConfiguration: "rigid",
-        testStationType: "gvts",
-        reasonForCancellation: "none",
-        testerName: "Dorel",
-        vrm: "JY58FPP",
-        testStationPNumber: "87-1369569",
-        numberOfSeats: 45,
-        testerEmailAddress: "dorel.popescu@dvsagov.uk",
-        euVehicleCategory: "m1",
-      },
-    ];
-
     context(
       "when fetching test result stream and the eventName is INSERT",
       () => {
@@ -145,17 +145,29 @@ describe("cert-gen-init", () => {
   });
 
   context("SQService", () => {
-      const client = mockClient(SQSClient)
-      const mock = new SQMockClient()
-      const sqService = new SQService(client)
-      const config = Configuration.getInstance().getConfig()
-      mock.createQueue({QueueName: config.sqs.local.queueName[0]})
-      beforeEach(() => {
-        // client.reset();
-        client.on(GetQueueUrlCommand).resolves(mock.getQueueUrl(config.sqs.local.queueName[0]));
-        client.on(SendMessageCommand).resolves(mock.sendMessage({ QueueUrl: config.sqs.local.queueName[0], MessageBody: JSON.stringify({"countryOfRegistration": "united kingdom", "euVehicleCategory": "m1", "numberOfSeats": 45, "odometerReading": 100000, "odometerReadingUnits": "kilometres", "order": {"current": 1, "total": 1}, "preparerId": "ak4434", "preparerName": "Durrell Vehicles Limited", "reasonForCancellation": "none", "testEndTimestamp": "2019-01-21T10:37:33.987Z", "testResultId": "1", "testStartTimestamp": "2019-01-21T10:36:33.987Z", "testStationName": "Rowe, Wunsch and Wisoky", "testStationPNumber": "87-1369569", "testStationType": "gvts", "testStatus": "submitted", "testTypes": {"additionalCommentsForAbandon": "none", "additionalNotesRecorded": "VEHICLE FRONT REGISTRATION PLATE MISSING", "certificateLink": "http://dvsagov.co.uk", "certificateNumber": "1234", "createdAt": "2019-02-21T12:06:29.194Z", "defects": [{"additionalInformation": {"location": {"axleNumber": null, "horizontal": null, "lateral": null, "longitudinal": "front", "rowNumber": null, "seatNumber": null, "vertical": null}, "notes": "None"}, "deficiencyCategory": "major", "deficiencyId": "a", "deficiencyRef": "1.1.a", "deficiencySubId": null, "deficiencyText": "missing.", "imDescription": "Registration Plate", "imNumber": 1, "itemDescription": "A registration plate:", "itemNumber": 1, "prs": false, "stdForProhibition": false}], "lastSeatbeltInstallationCheckDate": "2019-01-14", "lastUpdatedAt": "2019-02-21T12:06:29.194Z", "name": "Annual test", "numberOfSeatbeltsFitted": 2, "prohibitionIssued": false, "reasonForAbandoning": "none", "seatbeltInstallationCheckDate": true, "testCode": "aas", "testResult": "fail", "testTypeClassification": "Annual With Certificate", "testTypeEndTimestamp": "2019-01-14T10:36:33.987Z", "testTypeId": "1", "testTypeName": "Annual test", "testTypeStartTimestamp": "2019-01-14T10:36:33.987Z"}, "testerEmailAddress": "dorel.popescu@dvsagov.uk", "testerName": "Dorel", "testerStaffId": "1", "vehicleClass": {"code": "2", "description": "over 200cc or with a sidecar"}, "vehicleConfiguration": "rigid", "vehicleId": "JY58FPP", "vehicleSize": "small", "vehicleType": "psv", "vin": "XMGDE02FS0H012345", "vrm": "JY58FPP"})}))
-        .on(ReceiveMessageCommand).resolves(mock.receiveMessage({ QueueUrl: config.sqs.local.queueName[0] }));
-      })
+    const client = mockClient(SQSClient);
+    const mock = new SQMockClient();
+    const sqService = new SQService(client);
+    const config = Configuration.getInstance().getConfig();
+    mock.createQueue({ QueueName: config.sqs.local.queueName[0] });
+    beforeEach(() => {
+      // client.reset();
+      client
+        .on(GetQueueUrlCommand)
+        .resolves(mock.getQueueUrl(config.sqs.local.queueName[0]));
+      client
+        .on(SendMessageCommand)
+        .resolves(
+          mock.sendMessage({
+            QueueUrl: config.sqs.local.queueName[0],
+            MessageBody: JSON.stringify(expectedResult[0]),
+          })
+        )
+        .on(ReceiveMessageCommand)
+        .resolves(
+          mock.receiveMessage({ QueueUrl: config.sqs.local.queueName[0] })
+        );
+    });
     context("when adding a record to the queue", () => {
       context("and the queue does not exist", () => {
         it("should successfully add the records to the certGen queue", () => {
@@ -204,15 +216,9 @@ describe("cert-gen-init", () => {
         });
 
         it("should successfully read the added records from the queue", async () => {
-          console.log(mock)
-          client.on(GetQueueUrlCommand).resolves(mock.getQueueUrl(config.sqs.local.queueName[0]));
-          client.on(SendMessageCommand).resolves(mock.sendMessage({QueueUrl: config.sqs.local.queueName[0], MessageBody: JSON.stringify({"countryOfRegistration": "united kingdom", "euVehicleCategory": "m1", "numberOfSeats": 45, "odometerReading": 100000, "odometerReadingUnits": "kilometres", "order": {"current": 1, "total": 1}, "preparerId": "ak4434", "preparerName": "Durrell Vehicles Limited", "reasonForCancellation": "none", "testEndTimestamp": "2019-01-21T10:37:33.987Z", "testResultId": "1", "testStartTimestamp": "2019-01-21T10:36:33.987Z", "testStationName": "Rowe, Wunsch and Wisoky", "testStationPNumber": "87-1369569", "testStationType": "gvts", "testStatus": "submitted", "testTypes": {"additionalCommentsForAbandon": "none", "additionalNotesRecorded": "VEHICLE FRONT REGISTRATION PLATE MISSING", "certificateLink": "http://dvsagov.co.uk", "certificateNumber": "1234", "createdAt": "2019-02-21T12:06:29.194Z", "defects": [{"additionalInformation": {"location": {"axleNumber": null, "horizontal": null, "lateral": null, "longitudinal": "front", "rowNumber": null, "seatNumber": null, "vertical": null}, "notes": "None"}, "deficiencyCategory": "major", "deficiencyId": "a", "deficiencyRef": "1.1.a", "deficiencySubId": null, "deficiencyText": "missing.", "imDescription": "Registration Plate", "imNumber": 1, "itemDescription": "A registration plate:", "itemNumber": 1, "prs": false, "stdForProhibition": false}], "lastSeatbeltInstallationCheckDate": "2019-01-14", "lastUpdatedAt": "2019-02-21T12:06:29.194Z", "name": "Annual test", "numberOfSeatbeltsFitted": 2, "prohibitionIssued": false, "reasonForAbandoning": "none", "seatbeltInstallationCheckDate": true, "testCode": "aas", "testResult": "fail", "testTypeClassification": "Annual With Certificate", "testTypeEndTimestamp": "2019-01-14T10:36:33.987Z", "testTypeId": "1", "testTypeName": "Annual test", "testTypeStartTimestamp": "2019-01-14T10:36:33.987Z"}, "testerEmailAddress": "dorel.popescu@dvsagov.uk", "testerName": "Dorel", "testerStaffId": "1", "vehicleClass": {"code": "2", "description": "over 200cc or with a sidecar"}, "vehicleConfiguration": "rigid", "vehicleId": "JY58FPP", "vehicleSize": "small", "vehicleType": "psv", "vin": "XMGDE02FS0H012345", "vrm": "JY58FPP"})}))
-          client.on(ReceiveMessageCommand).resolves(mock.receiveMessage(config.sqs.local.queueName[0]))
-          
           return sqService
             .getMessages()
             .then((messages: ReceiveMessageCommandOutput) => {
-              console.log(messages)
               expect(
                 messages.Messages?.map((message) =>
                   JSON.parse(message.Body as string)
@@ -223,8 +229,6 @@ describe("cert-gen-init", () => {
                   QueueUrl: "sqs://queue/cert-gen-q",
                 })
               );
-            }).catch(error => {
-              console.log(error)
             });
         });
 

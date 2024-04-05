@@ -1,6 +1,6 @@
 // import { DynamoDB } from "aws-sdk";
 import { DynamoDBRecord } from "aws-lambda";
-import { unmarshall } from '@aws-sdk/util-dynamodb'
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 /**
  * Service class for interpreting and formatting

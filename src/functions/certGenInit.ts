@@ -5,7 +5,6 @@ import { SQService } from "../services/SQService";
 import { StreamService } from "../services/StreamService";
 import { Utils } from "../utils/Utils";
 import { Configuration } from "../utils/Configuration";
-const AWSXRay = require("aws-xray-sdk");
 
 /**
  * λ function to process a DynamoDB stream of test results into a queue for certificate generation.
@@ -27,14 +26,11 @@ const certGenInit: Handler = async (
   const expandedRecords: any[] = StreamService.getTestResultStream(event);
   const certGenFilteredRecords: any[] =
     Utils.filterCertificateGenerationRecords(expandedRecords);
-    
 
   // Instantiate the Simple Queue Service
   let config: any = Configuration.getInstance().getConfig();
   const env: string =
-  !process.env.BRANCH || process.env.BRANCH === "local"
-    ? "local"
-    : "remote";
+    !process.env.BRANCH || process.env.BRANCH === "local" ? "local" : "remote";
   config = config.sqs[env];
   const client = new SQSClient(config);
 

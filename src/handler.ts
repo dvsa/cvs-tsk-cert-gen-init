@@ -1,5 +1,8 @@
 import { certGenInit } from "./functions/certGenInit";
-import { PutSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
+import {
+  PutSecretValueCommand,
+  SecretsManagerClient,
+} from "@aws-sdk/client-secrets-manager";
 
 const isOffline: boolean =
   !process.env.BRANCH || process.env.BRANCH === "local";
@@ -11,11 +14,11 @@ if (isOffline) {
     SecretId: "secretid1",
     SecretString: JSON.stringify({
       accessKeyId: "offline",
-      secretAccessKey: "offline"
+      secretAccessKey: "offline",
     }),
   });
 
-  SMC.send(command)
+  SMC.send(command);
 }
 
 export { certGenInit as handler };

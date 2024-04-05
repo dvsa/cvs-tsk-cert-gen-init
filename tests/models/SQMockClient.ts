@@ -1,14 +1,13 @@
-import { 
-  CreateQueueRequest, 
-  DeleteQueueRequest, 
-  GetQueueUrlRequest, 
-  GetQueueUrlResult, 
-  SendMessageRequest, 
-  SendMessageResult, 
-  ReceiveMessageRequest, 
-  ReceiveMessageResult, 
+import {
+  CreateQueueRequest,
+  DeleteQueueRequest,
+  GetQueueUrlRequest,
+  GetQueueUrlResult,
+  SendMessageRequest,
+  SendMessageResult,
+  ReceiveMessageRequest,
+  ReceiveMessageResult,
 } from "@aws-sdk/client-sqs";
-
 
 interface IQueue {
   queueName: string;
@@ -20,7 +19,7 @@ interface IQueue {
  * Mock class that mocks the functionality of the SQService class
  */
 class SQMockClient {
-  readonly queues: IQueue[] = [];
+  private readonly queues: IQueue[] = [];
 
   /**
    * Creates a new queue
@@ -94,7 +93,7 @@ class SQMockClient {
             });
           }
 
-          reject(new Error(`Queue ${params.QueueUrl ? params.QueueUrl : 'cert-gen-q'} was not found.`));
+          reject(new Error(`Queue ${params.QueueUrl} was not found.`));
         });
       },
     };
@@ -114,12 +113,12 @@ class SQMockClient {
         return new Promise((resolve, reject) => {
           const foundQueue = this.queues.find(
             (queue) => queue.queueURL === params.QueueUrl
-            );
+          );
 
           if (foundQueue) {
             resolve({ Messages: [{ Body: foundQueue.queueMessages }] });
           }
-          
+
           reject(new Error(`Queue ${params.QueueUrl} was not found.`));
         });
       },

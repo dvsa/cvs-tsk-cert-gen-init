@@ -36,9 +36,9 @@ class SQService {
     const config: any = Configuration.getInstance().getConfig();
 
     const env: string =
-    !process.env.BRANCH || process.env.BRANCH === "local"
-      ? "local"
-      : "remote";
+      !process.env.BRANCH || process.env.BRANCH === "local"
+        ? "local"
+        : "remote";
     this.config = config.sqs[env];
 
     this.sqsClient = sqsClient;
@@ -46,7 +46,7 @@ class SQService {
     if (!config.sqs) {
       throw new Error("SQS config is not defined in the config file.");
     }
- 
+
     // AWSConfig.sqs = this.config.params;
   }
 
@@ -55,7 +55,6 @@ class SQService {
    * @param messageBody
    */
   public sendCertGenMessage(messageBody: string) {
-    console.log(this.config)
     return this.sendMessage(messageBody, this.config.queueName[0]);
   }
 
@@ -65,7 +64,7 @@ class SQService {
    * @param messageAttributes - A MessageAttributeMap
    * @param queueName - The queue name
    */
-   private async sendMessage(
+  private async sendMessage(
     messageBody: string,
     queueName: string,
     messageAttributes?: Record<string, MessageAttributeValue>
@@ -98,11 +97,11 @@ class SQService {
     ReceiveMessageCommandOutput | ServiceException
   > {
     // Get the queue URL for the provided queue name
-    console.log('here in getMessages');
+    console.log("here in getMessages");
     const queueUrlResult: GetQueueUrlCommandOutput = await this.sqsClient.send(
       new GetQueueUrlCommand({ QueueName: this.config.queueName[0] })
     );
-    console.log('after get queueurl');
+    console.log("after get queueurl");
     // Get the messages from the queue
     return this.sqsClient.send(
       new ReceiveMessageCommand({ QueueUrl: queueUrlResult.QueueUrl! })
