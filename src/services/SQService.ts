@@ -10,12 +10,12 @@ import {
   SendMessageCommand,
   SendMessageCommandInput,
   SendMessageCommandOutput,
+  SetQueueAttributesCommand,
 } from "@aws-sdk/client-sqs";
 
 import { Service } from "../models/injector/ServiceDecorator";
 import { Configuration } from "../utils/Configuration";
-// import { PromiseResult } from "aws-sdk/lib/request";
-import { config as AWSConfig } from "aws-sdk";
+
 /* tslint:disable */
 const AWSXRay = require("aws-xray-sdk");
 /* tslint:enable */
@@ -32,22 +32,22 @@ class SQService {
    * Constructor for the ActivityService class
    * @param sqsClient - The Simple Queue Service client
    */
-  constructor(sqsClient: SQSClient) {
+  constructor(sqsClient: any) {
     const config: any = Configuration.getInstance().getConfig();
-    this.sqsClient = AWSXRay.captureAWSv3Client(sqsClient);
+
+    const env: string =
+    !process.env.BRANCH || process.env.BRANCH === "local"
+      ? "local"
+      : "remote";
+    this.config = config.sqs[env];
+
+    this.sqsClient = sqsClient;
 
     if (!config.sqs) {
       throw new Error("SQS config is not defined in the config file.");
     }
-
-    // Not defining BRANCH will default to local
-    const env: string =
-      !process.env.BRANCH || process.env.BRANCH === "local"
-        ? "local"
-        : "remote";
-    this.config = config.sqs[env];
-
-    AWSConfig.sqs = this.config.params;
+ 
+    // AWSConfig.sqs = this.config.params;
   }
 
   /**
@@ -55,6 +55,7 @@ class SQService {
    * @param messageBody
    */
   public sendCertGenMessage(messageBody: string) {
+    console.log(this.config)
     return this.sendMessage(messageBody, this.config.queueName[0]);
   }
 
@@ -64,7 +65,7 @@ class SQService {
    * @param messageAttributes - A MessageAttributeMap
    * @param queueName - The queue name
    */
-  private async sendMessage(
+   private async sendMessage(
     messageBody: string,
     queueName: string,
     messageAttributes?: Record<string, MessageAttributeValue>
@@ -97,9 +98,11 @@ class SQService {
     ReceiveMessageCommandOutput | ServiceException
   > {
     // Get the queue URL for the provided queue name
+    console.log('here in getMessages');
     const queueUrlResult: GetQueueUrlCommandOutput = await this.sqsClient.send(
       new GetQueueUrlCommand({ QueueName: this.config.queueName[0] })
     );
+    console.log('after get queueurl');
     // Get the messages from the queue
     return this.sqsClient.send(
       new ReceiveMessageCommand({ QueueUrl: queueUrlResult.QueueUrl! })

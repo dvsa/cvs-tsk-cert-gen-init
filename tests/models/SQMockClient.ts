@@ -1,8 +1,14 @@
-import { AWSError } from "aws-sdk";
-import SQS, {
-  CreateQueueRequest,
-  DeleteQueueRequest,
-} from "aws-sdk/clients/sqs";
+import { 
+  CreateQueueRequest, 
+  DeleteQueueRequest, 
+  GetQueueUrlRequest, 
+  GetQueueUrlResult, 
+  SendMessageRequest, 
+  SendMessageResult, 
+  ReceiveMessageRequest, 
+  ReceiveMessageResult, 
+} from "@aws-sdk/client-sqs";
+
 
 interface IQueue {
   queueName: string;
@@ -14,7 +20,7 @@ interface IQueue {
  * Mock class that mocks the functionality of the SQService class
  */
 class SQMockClient {
-  private readonly queues: IQueue[] = [];
+  readonly queues: IQueue[] = [];
 
   /**
    * Creates a new queue
@@ -22,7 +28,7 @@ class SQMockClient {
    */
   public createQueue(queue: CreateQueueRequest) {
     this.queues.push({
-      queueName: queue.QueueName,
+      queueName: queue.QueueName!,
       queueURL: `sqs://queue/${queue.QueueName}`, // This is a mock value. It doesn't mean anything.
       queueMessages: [],
     });
@@ -45,8 +51,8 @@ class SQMockClient {
    * @param callback - optional callback function
    */
   public getQueueUrl(
-    params: SQS.Types.GetQueueUrlRequest,
-    callback?: (err: AWSError, data: SQS.Types.GetQueueUrlResult) => void
+    params: GetQueueUrlRequest,
+    callback?: (err: any, data: GetQueueUrlResult) => void
   ): any {
     return {
       promise: () => {
@@ -71,8 +77,8 @@ class SQMockClient {
    * @param callback - optional callback function
    */
   public sendMessage(
-    params: SQS.Types.SendMessageRequest,
-    callback?: (err: AWSError, data: SQS.Types.SendMessageResult) => void
+    params: SendMessageRequest,
+    callback?: (err: any, data: SendMessageResult) => void
   ): any {
     return {
       promise: () => {
@@ -82,13 +88,13 @@ class SQMockClient {
           );
 
           if (foundQueue) {
-            foundQueue.queueMessages.push(params.MessageBody);
+            foundQueue.queueMessages.push(params.MessageBody!!);
             resolve({
               MessageId: "mock",
             });
           }
 
-          reject(new Error(`Queue ${params.QueueUrl} was not found.`));
+          reject(new Error(`Queue ${params.QueueUrl ? params.QueueUrl : 'cert-gen-q'} was not found.`));
         });
       },
     };
@@ -100,20 +106,20 @@ class SQMockClient {
    * @param callback - optional callback function
    */
   public receiveMessage(
-    params: SQS.Types.ReceiveMessageRequest,
-    callback?: (err: AWSError, data: SQS.Types.ReceiveMessageResult) => void
+    params: ReceiveMessageRequest,
+    callback?: (err: any, data: ReceiveMessageResult) => void
   ): any {
     return {
       promise: () => {
         return new Promise((resolve, reject) => {
           const foundQueue = this.queues.find(
             (queue) => queue.queueURL === params.QueueUrl
-          );
+            );
 
           if (foundQueue) {
             resolve({ Messages: [{ Body: foundQueue.queueMessages }] });
           }
-
+          
           reject(new Error(`Queue ${params.QueueUrl} was not found.`));
         });
       },

@@ -1,10 +1,11 @@
 import { Callback, Context, Handler } from "aws-lambda";
 import { ServiceException } from "@smithy/smithy-client";
-import { SendMessageCommandOutput, SQS, SQSClient } from "@aws-sdk/client-sqs";
+import { SendMessageCommandOutput, SQSClient } from "@aws-sdk/client-sqs";
 import { SQService } from "../services/SQService";
-import { PromiseResult } from "aws-sdk/lib/request";
 import { StreamService } from "../services/StreamService";
 import { Utils } from "../utils/Utils";
+import { Configuration } from "../utils/Configuration";
+const AWSXRay = require("aws-xray-sdk");
 
 /**
  * λ function to process a DynamoDB stream of test results into a queue for certificate generation.
@@ -26,9 +27,18 @@ const certGenInit: Handler = async (
   const expandedRecords: any[] = StreamService.getTestResultStream(event);
   const certGenFilteredRecords: any[] =
     Utils.filterCertificateGenerationRecords(expandedRecords);
+    
 
   // Instantiate the Simple Queue Service
-  const sqService: SQService = new SQService(new SQSClient());
+  let config: any = Configuration.getInstance().getConfig();
+  const env: string =
+  !process.env.BRANCH || process.env.BRANCH === "local"
+    ? "local"
+    : "remote";
+  config = config.sqs[env];
+  const client = new SQSClient(config);
+
+  const sqService: SQService = new SQService(client);
   const sendMessagePromises: Array<
     Promise<SendMessageCommandOutput | ServiceException>
   > = [];
