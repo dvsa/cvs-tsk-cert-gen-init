@@ -14,8 +14,7 @@ import { StreamService } from "../../src/services/StreamService";
 import { Configuration } from "../../src/utils/Configuration";
 import { SQMockClient } from "../models/SQMockClient";
 import event from "../resources/stream-event.json";
-import { mockClient } from "aws-sdk-client-mock";
-
+import {mockClient} from "aws-sdk-client-mock";
 const expectedResult: any[] = [
   {
     testerStaffId: "1",
@@ -100,11 +99,11 @@ const expectedResult: any[] = [
     euVehicleCategory: "m1",
   },
 ];
-
 describe("cert-gen-init", () => {
   let processedEvent: any;
 
   context("StreamService", () => {
+
     context(
       "when fetching test result stream and the eventName is INSERT",
       () => {
@@ -145,30 +144,18 @@ describe("cert-gen-init", () => {
   });
 
   context("SQService", () => {
-    const client = mockClient(SQSClient);
-    const mock = new SQMockClient();
-    const sqService = new SQService(client);
-    const config = Configuration.getInstance().getConfig();
-    mock.createQueue({ QueueName: config.sqs.local.queueName[0] });
-    beforeEach(() => {
-      // client.reset();
-      client
-        .on(GetQueueUrlCommand)
-        .resolves(mock.getQueueUrl(config.sqs.local.queueName[0]));
-      client
-        .on(SendMessageCommand)
-        .resolves(
-          mock.sendMessage({
-            QueueUrl: config.sqs.local.queueName[0],
-            MessageBody: JSON.stringify(expectedResult[0]),
-          })
-        )
-        .on(ReceiveMessageCommand)
-        .resolves(
-          mock.receiveMessage({ QueueUrl: config.sqs.local.queueName[0] })
-        );
-    });
-    context("when adding a record to the queue", () => {
+      const client = mockClient(SQSClient);
+      const mock = new SQMockClient();
+      const sqService = new SQService(client);
+      const config = Configuration.getInstance().getConfig();
+      mock.createQueue({QueueName: config.sqs.local.queueName[0]});
+      beforeEach(() => {
+        // client.reset();
+        client.on(GetQueueUrlCommand).resolves(mock.getQueueUrl(config.sqs.local.queueName[0]));
+        client.on(SendMessageCommand).resolves(mock.sendMessage({ QueueUrl: config.sqs.local.queueName[0], MessageBody: JSON.stringify(expectedResult[0])}))
+        .on(ReceiveMessageCommand).resolves(mock.receiveMessage({ QueueUrl: config.sqs.local.queueName[0] }));
+      });
+  context("when adding a record to the queue", () => {
       context("and the queue does not exist", () => {
         it("should successfully add the records to the certGen queue", () => {
           const sendMessagePromises: Array<
@@ -216,6 +203,7 @@ describe("cert-gen-init", () => {
         });
 
         it("should successfully read the added records from the queue", async () => {
+
           return sqService
             .getMessages()
             .then((messages: ReceiveMessageCommandOutput) => {
