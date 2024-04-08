@@ -145,7 +145,7 @@ describe("cert-gen-init", () => {
   context("SQService", () => {
     const client = mockClient(SQSClient);
     const mock = new SQMockClient();
-    const sqService = new SQService(client);
+    const sqService = new SQService(client as unknown as SQSClient);
     const config = Configuration.getInstance().getConfig();
     mock.createQueue({ QueueName: config.sqs.local.queueName[0] });
     beforeEach(() => {

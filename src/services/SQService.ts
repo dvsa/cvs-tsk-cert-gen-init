@@ -32,7 +32,7 @@ class SQService {
    * Constructor for the ActivityService class
    * @param sqsClient - The Simple Queue Service client
    */
-  constructor(sqsClient: any) {
+  constructor(sqsClient: SQSClient) {
     const config: any = Configuration.getInstance().getConfig();
 
     const env: string =
