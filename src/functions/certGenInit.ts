@@ -4,7 +4,6 @@ import { SendMessageCommandOutput, SQSClient } from "@aws-sdk/client-sqs";
 import { SQService } from "../services/SQService";
 import { StreamService } from "../services/StreamService";
 import { Utils } from "../utils/Utils";
-import { Configuration } from "../utils/Configuration";
 
 /**
  * λ function to process a DynamoDB stream of test results into a queue for certificate generation.
@@ -16,7 +15,7 @@ const certGenInit: Handler = async (
   event: any,
   context?: Context,
   callback?: Callback
-): Promise<void | Array<SendMessageCommandOutput | ServiceException>> => {
+): Promise<void | Array<SendMessageCommandOutput | any>> => {
   if (!event) {
     console.error("ERROR: event is not defined.");
     return;
@@ -28,9 +27,7 @@ const certGenInit: Handler = async (
     Utils.filterCertificateGenerationRecords(expandedRecords);
 
   // Instantiate the Simple Queue Service
-  const client = new SQSClient();
-
-  const sqService: SQService = new SQService(client);
+  const sqService: SQService = new SQService(new SQSClient());
   const sendMessagePromises: Array<
     Promise<SendMessageCommandOutput | ServiceException>
   > = [];

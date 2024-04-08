@@ -10,7 +10,7 @@ import {
 } from "@aws-sdk/client-sqs";
 
 interface IQueue {
-  queueName: string;
+  queueName?: string;
   queueURL: string;
   queueMessages: string[];
 }
@@ -27,7 +27,7 @@ class SQMockClient {
    */
   public createQueue(queue: CreateQueueRequest) {
     this.queues.push({
-      queueName: queue.QueueName!,
+      queueName: queue.QueueName,
       queueURL: `sqs://queue/${queue.QueueName}`, // This is a mock value. It doesn't mean anything.
       queueMessages: [],
     });
@@ -86,8 +86,8 @@ class SQMockClient {
             (queue) => queue.queueURL === params.QueueUrl
           );
 
-          if (foundQueue) {
-            foundQueue.queueMessages.push(params.MessageBody!!);
+          if (foundQueue && params.MessageBody) {
+            foundQueue.queueMessages.push(params.MessageBody);
             resolve({
               MessageId: "mock",
             });
