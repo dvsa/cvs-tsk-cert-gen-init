@@ -41,7 +41,7 @@ class SQService {
         : "remote";
     this.config = config.sqs[env];
 
-    this.sqsClient = sqsClient;
+    this.sqsClient = new SQSClient({...sqsClient, ...this.config});
 
     if (!config.sqs) {
       throw new Error("SQS config is not defined in the config file.");

@@ -28,11 +28,7 @@ const certGenInit: Handler = async (
     Utils.filterCertificateGenerationRecords(expandedRecords);
 
   // Instantiate the Simple Queue Service
-  let config: any = Configuration.getInstance().getConfig();
-  const env: string =
-    !process.env.BRANCH || process.env.BRANCH === "local" ? "local" : "remote";
-  config = config.sqs[env];
-  const client = new SQSClient(config);
+  const client = new SQSClient();
 
   const sqService: SQService = new SQService(client);
   const sendMessagePromises: Array<
@@ -45,7 +41,7 @@ const certGenInit: Handler = async (
     );
   });
 
-  return Promise.all(sendMessagePromises).catch((error: any) => {
+  return Promise.all(sendMessagePromises).catch((error) => {
     console.error(error);
     console.log("expandedRecords");
     console.log(JSON.stringify(expandedRecords));
