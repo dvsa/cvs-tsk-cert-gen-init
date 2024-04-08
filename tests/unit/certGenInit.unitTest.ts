@@ -15,6 +15,7 @@ import { Configuration } from "../../src/utils/Configuration";
 import { SQMockClient } from "../models/SQMockClient";
 import event from "../resources/stream-event.json";
 import { mockClient } from "aws-sdk-client-mock";
+
 const record = {
   testerStaffId: "1",
   testStartTimestamp: "2019-01-21T10:36:33.987Z",
