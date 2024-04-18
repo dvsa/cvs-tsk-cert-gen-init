@@ -1,8 +1,7 @@
 import { Callback, Context, Handler } from "aws-lambda";
-import { AWSError, SQS } from "aws-sdk";
+import { ServiceException } from "@smithy/smithy-client";
+import { SendMessageCommandOutput, SQSClient } from "@aws-sdk/client-sqs";
 import { SQService } from "../services/SQService";
-import { PromiseResult } from "aws-sdk/lib/request";
-import { SendMessageResult } from "aws-sdk/clients/sqs";
 import { StreamService } from "../services/StreamService";
 import { Utils } from "../utils/Utils";
 
@@ -16,7 +15,7 @@ const certGenInit: Handler = async (
   event: any,
   context?: Context,
   callback?: Callback
-): Promise<void | Array<PromiseResult<SendMessageResult, AWSError>>> => {
+): Promise<void | Array<SendMessageCommandOutput | any>> => {
   if (!event) {
     console.error("ERROR: event is not defined.");
     return;
@@ -28,9 +27,9 @@ const certGenInit: Handler = async (
     Utils.filterCertificateGenerationRecords(expandedRecords);
 
   // Instantiate the Simple Queue Service
-  const sqService: SQService = new SQService(new SQS());
+  const sqService: SQService = new SQService(new SQSClient());
   const sendMessagePromises: Array<
-    Promise<PromiseResult<SendMessageResult, AWSError>>
+    Promise<SendMessageCommandOutput | ServiceException>
   > = [];
 
   certGenFilteredRecords.forEach((record: any) => {
@@ -39,7 +38,7 @@ const certGenInit: Handler = async (
     );
   });
 
-  return Promise.all(sendMessagePromises).catch((error: AWSError) => {
+  return Promise.all(sendMessagePromises).catch((error) => {
     console.error(error);
     console.log("expandedRecords");
     console.log(JSON.stringify(expandedRecords));

@@ -118,43 +118,43 @@ describe("utils", () => {
 
     it("should filter correctly events that have MSVA With Certificate, requiredStandards populated but not test result fail", () => {
       expandedRecords[0].testTypes.testTypeClassification =
-          "MSVA With Certificate";
+        "MSVA With Certificate";
       expandedRecords[0].testTypes.requiredStandards = [{}];
       expandedRecords[0].testTypes.testResult = "pass";
       const filteredRecords: any[] =
-          Utils.filterCertificateGenerationRecords(expandedRecords);
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
       expect(filteredRecords.length).toBe(0);
     });
 
     it("should filter correctly events that have MSVA With Certificate, test result fail but no requiredStandards", () => {
       expandedRecords[0].testTypes.testTypeClassification =
-          "MSVA With Certificate";
+        "MSVA With Certificate";
       expandedRecords[0].testTypes.testResult = "fail";
       const filteredRecords: any[] =
-          Utils.filterCertificateGenerationRecords(expandedRecords);
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
       expect(filteredRecords.length).toBe(0);
     });
 
     it("should filter correctly events that have MSVA With Certificate, test result fail but empty requiredStandards", () => {
       expandedRecords[0].testTypes.testTypeClassification =
-          "MSVA With Certificate";
+        "MSVA With Certificate";
       expandedRecords[0].testTypes.testResult = "fail";
       expandedRecords[0].testTypes.requiredStandards = [];
       const filteredRecords: any[] =
-          Utils.filterCertificateGenerationRecords(expandedRecords);
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
       expect(filteredRecords.length).toBe(0);
     });
 
     it("should not remove events which have MSVA With Certificate, requiredStandards and test result fail", () => {
       expandedRecords[0].testTypes.testTypeClassification =
-          "MSVA With Certificate";
+        "MSVA With Certificate";
       expandedRecords[0].testTypes.testResult = "fail";
       expandedRecords[0].testTypes.requiredStandards = [{}];
       const filteredRecords: any[] =
-          Utils.filterCertificateGenerationRecords(expandedRecords);
+        Utils.filterCertificateGenerationRecords(expandedRecords);
 
       expect(filteredRecords).toEqual(expandedRecords);
     });

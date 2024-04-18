@@ -1,5 +1,6 @@
+// import { DynamoDB } from "aws-sdk";
 import { DynamoDBRecord } from "aws-lambda";
-import { DynamoDB } from "aws-sdk";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 /**
  * Service class for interpreting and formatting
@@ -33,10 +34,10 @@ class StreamService {
         (record.eventName === "MODIFY" &&
           StreamService.isProcessModifyEventsEnabled())
       );
-    }).map((record: DynamoDBRecord) => {
+    }).map((record: any) => {
       // Convert to JS object
       if (record.dynamodb && record.dynamodb.NewImage) {
-        return DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
+        return unmarshall(record.dynamodb.NewImage);
       }
     });
 
