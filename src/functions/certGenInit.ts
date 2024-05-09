@@ -23,8 +23,11 @@ const certGenInit: Handler = async (
 
   // Convert the received event into a readable array of filtered test results
   const expandedRecords: any[] = StreamService.getTestResultStream(event);
+  console.log(`Number of Retrieved records: ${expandedRecords.length}`);
   const certGenFilteredRecords: any[] =
     Utils.filterCertificateGenerationRecords(expandedRecords);
+
+  console.log(`Number of Filtered Retrieved Records: ${certGenFilteredRecords.length}`)
 
   // Instantiate the Simple Queue Service
   const sqService: SQService = new SQService(new SQSClient());
@@ -33,8 +36,10 @@ const certGenInit: Handler = async (
   > = [];
 
   certGenFilteredRecords.forEach((record: any) => {
+    const stringifiedRecord = JSON.stringify(record);
+    console.log(stringifiedRecord);
     sendMessagePromises.push(
-      sqService.sendCertGenMessage(JSON.stringify(record))
+      sqService.sendCertGenMessage(stringifiedRecord)
     );
   });
 
