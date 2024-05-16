@@ -27,7 +27,7 @@ const certGenInit: Handler = async (
   const certGenFilteredRecords: any[] =
     Utils.filterCertificateGenerationRecords(expandedRecords);
 
-  console.log(`Number of Filtered Retrieved Records: ${certGenFilteredRecords.length}`)
+  console.log(`Number of Filtered Retrieved Records: ${certGenFilteredRecords.length}`);
 
   // Instantiate the Simple Queue Service
   const sqService: SQService = new SQService(new SQSClient());
