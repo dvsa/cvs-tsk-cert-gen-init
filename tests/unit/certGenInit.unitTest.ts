@@ -15,6 +15,7 @@ import { Configuration } from "../../src/utils/Configuration";
 import { SQMockClient } from "../models/SQMockClient";
 import event from "../resources/stream-event.json";
 import { mockClient } from "aws-sdk-client-mock";
+import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
 
 const record = {
   testerStaffId: "1",
@@ -130,6 +131,17 @@ describe("cert-gen-init", () => {
           processedEvent = StreamService.getTestResultStream(event);
           expect(processedEvent).toHaveLength(1);
           expect(processedEvent).toEqual(expectedResult);
+        });
+
+        it("should result in an empty array when the test type is an object", () => {
+          process.env.PROCESS_MODIFY_EVENTS = "true";
+          const eventWithTestTypeObject = unmarshall({...event}.Records[0].dynamodb.NewImage);
+          eventWithTestTypeObject.testTypes = {};
+          event.Records[0].eventName = "MODIFY";
+          const mainEvent = {...event};
+          mainEvent.Records[0].dynamodb.NewImage = marshall(eventWithTestTypeObject) as any;
+          processedEvent = StreamService.getTestResultStream(mainEvent);
+          expect(processedEvent).toEqual([]);
         });
 
         it("should throw an error if PROCESS_MODIFY_EVENTS is not true or false", () => {
