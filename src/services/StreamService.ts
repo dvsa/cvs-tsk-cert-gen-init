@@ -1,5 +1,6 @@
+// import { DynamoDB } from "aws-sdk";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { DynamoDBRecord } from "aws-lambda";
-import { DynamoDB } from "aws-sdk";
 
 /**
  * Service class for interpreting and formatting
@@ -25,6 +26,7 @@ class StreamService {
    * @param event
    */
   public static getTestResultStream(event: any) {
+    console.log(event);
     // Create from a test result with multiple test types, multiple test result with one test type each
     const records: any[] = event.Records.filter((record: DynamoDBRecord) => {
       // Retrieve "INSERT" events
@@ -33,10 +35,10 @@ class StreamService {
         (record.eventName === "MODIFY" &&
           StreamService.isProcessModifyEventsEnabled())
       );
-    }).map((record: DynamoDBRecord) => {
+    }).map((record: any) => {
       // Convert to JS object
       if (record.dynamodb && record.dynamodb.NewImage) {
-        return DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
+        return unmarshall(record.dynamodb.NewImage);
       }
     });
 
@@ -71,21 +73,26 @@ class StreamService {
         const splittedRecords: any[] = [];
         const templateRecord: any = Object.assign({}, record);
         Object.assign(templateRecord, {});
+        console.log("before for each");
+        if (record.testTypes instanceof Array) {
+              record.testTypes?.forEach((testType: any, i: number, array: any[]) => {
+                  console.log("in for each");
+                  const clonedRecord: any = Object.assign({}, templateRecord); // Create record from template
+                  Object.assign(clonedRecord, { testTypes: testType }); // Assign it the test type
+                  Object.assign(clonedRecord, {
+                      // Assign certificate order number
+                      order: {
+                          current: i + 1,
+                          total: array.length,
+                      },
+                  });
 
-        record.testTypes.forEach((testType: any, i: number, array: any[]) => {
-          const clonedRecord: any = Object.assign({}, templateRecord); // Create record from template
-          Object.assign(clonedRecord, { testTypes: testType }); // Assign it the test type
-          Object.assign(clonedRecord, {
-            // Assign certificate order number
-            order: {
-              current: i + 1,
-              total: array.length,
-            },
-          });
+                  splittedRecords.push(clonedRecord);
+              });
+          }
 
-          splittedRecords.push(clonedRecord);
-        });
 
+        console.log("after for each");
         return splittedRecords;
       })
       .reduce((acc: any[], val: any) => acc.concat(val), []); // Flatten the array
