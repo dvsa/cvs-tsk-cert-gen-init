@@ -36,7 +36,7 @@ describe("certGenInit Function", () => {
         .mockReturnValue([{ TestRecord: "certGenMessage" }]);
 
       try {
-        await certGenInit({Records: ["this is an event"]}, ctx, () => {
+        await certGenInit({ Records: ["this is an event"] }, ctx, () => {
           return;
         });
       } catch (e) {
@@ -66,9 +66,13 @@ describe("certGenInit Function", () => {
 
       expect.assertions(1);
       try {
-        const returnedInfo = await certGenInit({Records: ["this is an event"]}, ctx, () => {
-          return;
-        });
+        const returnedInfo = await certGenInit(
+          { Records: ["this is an event"] },
+          ctx,
+          () => {
+            return;
+          }
+        );
         expect(returnedInfo.batchItemFailures.length).toBe(1);
       } catch (e: any) {
         throw e;
@@ -90,9 +94,13 @@ describe("certGenInit Function", () => {
 
       expect.assertions(1);
       try {
-        const result = await certGenInit({Records: ["this is an event"]}, ctx, () => {
-          return;
-        });
+        const result = await certGenInit(
+          { Records: ["this is an event"] },
+          ctx,
+          () => {
+            return;
+          }
+        );
         expect(result).toBe({});
       } catch (e) {
         console.log(e);

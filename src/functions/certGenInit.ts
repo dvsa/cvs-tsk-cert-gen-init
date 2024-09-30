@@ -1,5 +1,12 @@
 import { SQSClient } from "@aws-sdk/client-sqs";
-import { Callback, Context, Handler, SQSBatchItemFailure, SQSBatchResponse, SQSEvent } from "aws-lambda";
+import {
+  Callback,
+  Context,
+  Handler,
+  SQSBatchItemFailure,
+  SQSBatchResponse,
+  SQSEvent,
+} from "aws-lambda";
 import { SQService } from "../services/SQService";
 import { StreamService } from "../services/StreamService";
 import { Utils } from "../utils/Utils";
@@ -29,8 +36,11 @@ const certGenInit: Handler = async (
       expandedRecords = StreamService.getTestResultStream(event);
       console.log(`Number of Retrieved records: ${expandedRecords.length}`);
 
-      certGenFilteredRecords = Utils.filterCertificateGenerationRecords(expandedRecords);
-      console.log(`Number of Filtered Retrieved Records: ${certGenFilteredRecords.length}`);
+      certGenFilteredRecords =
+        Utils.filterCertificateGenerationRecords(expandedRecords);
+      console.log(
+        `Number of Filtered Retrieved Records: ${certGenFilteredRecords.length}`
+      );
 
       // Instantiate the Simple Queue Service
       const sqService: SQService = new SQService(new SQSClient());
@@ -42,7 +52,6 @@ const certGenInit: Handler = async (
       }
 
       console.log(`event ${event.messageId} successfully processed`);
-
     } catch (err) {
       console.error(err);
       console.log("expandedRecords");

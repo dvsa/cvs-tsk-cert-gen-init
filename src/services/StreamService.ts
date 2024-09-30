@@ -75,22 +75,23 @@ class StreamService {
         Object.assign(templateRecord, {});
         console.log("before for each");
         if (record.testTypes instanceof Array) {
-              record.testTypes?.forEach((testType: any, i: number, array: any[]) => {
-                  console.log("in for each");
-                  const clonedRecord: any = Object.assign({}, templateRecord); // Create record from template
-                  Object.assign(clonedRecord, { testTypes: testType }); // Assign it the test type
-                  Object.assign(clonedRecord, {
-                      // Assign certificate order number
-                      order: {
-                          current: i + 1,
-                          total: array.length,
-                      },
-                  });
-
-                  splittedRecords.push(clonedRecord);
+          record.testTypes?.forEach(
+            (testType: any, i: number, array: any[]) => {
+              console.log("in for each");
+              const clonedRecord: any = Object.assign({}, templateRecord); // Create record from template
+              Object.assign(clonedRecord, { testTypes: testType }); // Assign it the test type
+              Object.assign(clonedRecord, {
+                // Assign certificate order number
+                order: {
+                  current: i + 1,
+                  total: array.length,
+                },
               });
-          }
 
+              splittedRecords.push(clonedRecord);
+            }
+          );
+        }
 
         console.log("after for each");
         return splittedRecords;
