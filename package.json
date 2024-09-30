@@ -59,7 +59,7 @@
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@commitlint/cli": "^12.1.4",
+    "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^12.1.4",
     "@types/aws-lambda": "^8.10.34",
     "@types/jest": "^24.0.21",
@@ -72,7 +72,7 @@
     "jest-plugin-context": "^2.9.0",
     "jest-sonar-reporter": "^2.0.0",
     "prettier": "^2.3.2",
-    "serverless": "^2.19.0",
+    "serverless": "^3.0.0",
     "serverless-plugin-tracing": "^2.0.0",
     "serverless-plugin-typescript": "^2.1.2",
     "sonar-scanner": "^3.1.0",

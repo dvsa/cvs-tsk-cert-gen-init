@@ -1,6 +1,5 @@
-import { Callback, Context, Handler } from "aws-lambda";
-import { ServiceException } from "@smithy/smithy-client";
-import { SendMessageCommandOutput, SQSClient } from "@aws-sdk/client-sqs";
+import { SQSClient } from "@aws-sdk/client-sqs";
+import { Callback, Context, Handler, SQSBatchItemFailure, SQSBatchResponse, SQSEvent } from "aws-lambda";
 import { SQService } from "../services/SQService";
 import { StreamService } from "../services/StreamService";
 import { Utils } from "../utils/Utils";
@@ -12,47 +11,49 @@ import { Utils } from "../utils/Utils";
  * @param callback - callback function
  */
 const certGenInit: Handler = async (
-  event: any,
+  event: SQSEvent,
   context?: Context,
   callback?: Callback
-): Promise<void | Array<SendMessageCommandOutput | any>> => {
+): Promise<SQSBatchResponse> => {
   if (!event) {
     console.error("ERROR: event is not defined.");
-    return;
+    throw new Error("ERROR: event is not defined");
   }
 
-  // Convert the received event into a readable array of filtered test results
-  const expandedRecords: any[] = StreamService.getTestResultStream(event);
-  console.log(`Number of Retrieved records: ${expandedRecords.length}`);
-  const certGenFilteredRecords: any[] =
-    Utils.filterCertificateGenerationRecords(expandedRecords);
+  const batchItemFailures: SQSBatchItemFailure[] = [];
+  let expandedRecords: any[];
+  let certGenFilteredRecords: any[];
 
-  console.log(`Number of Filtered Retrieved Records: ${certGenFilteredRecords.length}`);
+  event.Records.forEach(async (event) => {
+    try {
+      expandedRecords = StreamService.getTestResultStream(event);
+      console.log(`Number of Retrieved records: ${expandedRecords.length}`);
 
-  // Instantiate the Simple Queue Service
-  const sqService: SQService = new SQService(new SQSClient());
-  const sendMessagePromises: Array<
-    Promise<SendMessageCommandOutput | ServiceException>
-  > = [];
+      certGenFilteredRecords = Utils.filterCertificateGenerationRecords(expandedRecords);
+      console.log(`Number of Filtered Retrieved Records: ${certGenFilteredRecords.length}`);
 
-  certGenFilteredRecords.forEach((record: any) => {
-    const stringifiedRecord = JSON.stringify(record);
-    console.log(stringifiedRecord);
-    sendMessagePromises.push(
-      sqService.sendCertGenMessage(stringifiedRecord)
-    );
-  });
+      // Instantiate the Simple Queue Service
+      const sqService: SQService = new SQService(new SQSClient());
 
-  return Promise.all(sendMessagePromises).catch((error) => {
-    console.error(error);
-    console.log("expandedRecords");
-    console.log(JSON.stringify(expandedRecords));
-    console.log("certGenFilteredRecords");
-    console.log(JSON.stringify(certGenFilteredRecords));
-    if (error.code !== "InvalidParameterValue") {
-      throw error;
+      for (const record of certGenFilteredRecords) {
+        const stringifiedRecord = JSON.stringify(record);
+        console.log(stringifiedRecord);
+        await sqService.sendCertGenMessage(stringifiedRecord);
+      }
+
+      console.log(`event ${event.messageId} successfully processed`);
+
+    } catch (err) {
+      console.error(err);
+      console.log("expandedRecords");
+      console.log(JSON.stringify(expandedRecords));
+      console.log("certGenFilteredRecords");
+      console.log(JSON.stringify(certGenFilteredRecords));
+      batchItemFailures.push({ itemIdentifier: event.messageId });
     }
   });
+
+  return { batchItemFailures };
 };
 
 export { certGenInit };

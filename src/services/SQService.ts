@@ -9,8 +9,7 @@ import {
   SQSClient,
   SendMessageCommand,
   SendMessageCommandInput,
-  SendMessageCommandOutput,
-  SetQueueAttributesCommand,
+  SendMessageCommandOutput
 } from "@aws-sdk/client-sqs";
 
 import { Service } from "../models/injector/ServiceDecorator";
@@ -54,7 +53,7 @@ class SQService {
    * Send a message to cert-gen queue
    * @param messageBody
    */
-  public sendCertGenMessage(messageBody: string) {
+  public async sendCertGenMessage(messageBody: string) {
     console.log(`Message Body to be sent: ${messageBody}`);
     return this.sendMessage(messageBody, this.config.queueName[0]);
   }

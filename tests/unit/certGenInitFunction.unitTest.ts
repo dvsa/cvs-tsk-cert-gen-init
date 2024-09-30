@@ -17,8 +17,8 @@ describe("certGenInit Function", () => {
         const result = await certGenInit(undefined, ctx, () => {
           return;
         });
-        expect(result).toBe(undefined);
-      } catch (e) {
+      } catch (e: any) {
+        expect(e.message).toBe("ERROR: event is not defined");
         console.log(e);
       }
     });
@@ -36,7 +36,7 @@ describe("certGenInit Function", () => {
         .mockReturnValue([{ TestRecord: "certGenMessage" }]);
 
       try {
-        await certGenInit({}, ctx, () => {
+        await certGenInit({Records: ["this is an event"]}, ctx, () => {
           return;
         });
       } catch (e) {
@@ -64,14 +64,14 @@ describe("certGenInit Function", () => {
         .fn()
         .mockReturnValue([{ test: "thing" }]);
 
-      expect.assertions(2);
+      expect.assertions(1);
       try {
-        await certGenInit({}, ctx, () => {
+        const returnedInfo = await certGenInit({Records: ["this is an event"]}, ctx, () => {
           return;
         });
+        expect(returnedInfo.batchItemFailures.length).toBe(1);
       } catch (e: any) {
-        expect(e.message).toEqual(myError.message);
-        expect(e.code).toEqual(myError.code);
+        throw e;
       }
     });
     it("should not throw error if code is InvalidParameterValue", async () => {
@@ -90,7 +90,7 @@ describe("certGenInit Function", () => {
 
       expect.assertions(1);
       try {
-        const result = await certGenInit({}, ctx, () => {
+        const result = await certGenInit({Records: ["this is an event"]}, ctx, () => {
           return;
         });
         expect(result).toBe({});
