@@ -4,18 +4,18 @@ import {
   GetQueueUrlCommand,
   ReceiveMessageCommand,
   ReceiveMessageCommandOutput,
+  SQSClient,
   SendMessageCommand,
   SendMessageCommandOutput,
-  SQSClient,
 } from "@aws-sdk/client-sqs";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+import { mockClient } from "aws-sdk-client-mock";
 import { Injector } from "../../src/models/injector/Injector";
 import { SQService } from "../../src/services/SQService";
 import { StreamService } from "../../src/services/StreamService";
 import { Configuration } from "../../src/utils/Configuration";
 import { SQMockClient } from "../models/SQMockClient";
 import event from "../resources/stream-event.json";
-import { mockClient } from "aws-sdk-client-mock";
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 const record = {
   testerStaffId: "1",
