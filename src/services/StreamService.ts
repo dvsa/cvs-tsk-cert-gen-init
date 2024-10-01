@@ -25,24 +25,19 @@ class StreamService {
    *  └── test-type-3
    * @param event
    */
-  public static getTestResultStream(event: any) {
-    console.log(event);
+  public static getTestResultStream(record: DynamoDBRecord) {
+    console.log(record);
+    let records = [];
     // Create from a test result with multiple test types, multiple test result with one test type each
-    const records: any[] = event.Records.filter((record: DynamoDBRecord) => {
-      // Retrieve "INSERT" events
-      return (
-        record.eventName === "INSERT" ||
-        (record.eventName === "MODIFY" &&
-          StreamService.isProcessModifyEventsEnabled())
-      );
-    }).map((record: any) => {
-      // Convert to JS object
+    if (record.eventName === "INSERT" || (record.eventName === "MODIFY" && StreamService.isProcessModifyEventsEnabled())) {
       if (record.dynamodb && record.dynamodb.NewImage) {
-        return unmarshall(record.dynamodb.NewImage);
+        const unmarshalledRecord = unmarshall((record as any).dynamodb.NewImage);
+        records = StreamService.expandRecords([unmarshalledRecord]);
       }
-    });
-
-    return StreamService.expandRecords(records);
+    } else {
+      console.log("event name was not of correct type");
+    }
+    return records;
   }
 
   /**

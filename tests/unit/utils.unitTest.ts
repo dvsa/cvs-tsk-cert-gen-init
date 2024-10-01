@@ -6,7 +6,7 @@ describe("utils", () => {
   let expandedRecords: any[];
 
   beforeEach(() => {
-    expandedRecords = StreamService.getTestResultStream(event);
+    expandedRecords = StreamService.getTestResultStream(event.Records[0] as any);
   });
 
   afterAll(() => {

@@ -2,10 +2,10 @@ import { SQSClient } from "@aws-sdk/client-sqs";
 import {
   Callback,
   Context,
-  Handler,
-  SQSBatchItemFailure,
-  SQSBatchResponse,
-  SQSEvent,
+  DynamoDBBatchItemFailure,
+  DynamoDBBatchResponse,
+  DynamoDBStreamEvent,
+  Handler
 } from "aws-lambda";
 import { SQService } from "../services/SQService";
 import { StreamService } from "../services/StreamService";
@@ -18,22 +18,22 @@ import { Utils } from "../utils/Utils";
  * @param callback - callback function
  */
 const certGenInit: Handler = async (
-  event: SQSEvent,
+  event: DynamoDBStreamEvent,
   context?: Context,
   callback?: Callback
-): Promise<SQSBatchResponse> => {
+): Promise<DynamoDBBatchResponse> => {
   if (!event) {
     console.error("ERROR: event is not defined.");
     throw new Error("ERROR: event is not defined");
   }
 
-  const batchItemFailures: SQSBatchItemFailure[] = [];
+  const batchItemFailures: DynamoDBBatchItemFailure[] = [];
   let expandedRecords: any[];
   let certGenFilteredRecords: any[];
 
-  event.Records.forEach(async (event) => {
+  event.Records.forEach(async (record) => {
     try {
-      expandedRecords = StreamService.getTestResultStream(event);
+      expandedRecords = StreamService.getTestResultStream(record);
       console.log(`Number of Retrieved records: ${expandedRecords.length}`);
 
       certGenFilteredRecords =
@@ -51,14 +51,14 @@ const certGenInit: Handler = async (
         await sqService.sendCertGenMessage(stringifiedRecord);
       }
 
-      console.log(`event ${event.messageId} successfully processed`);
+      console.log(`event ${record.dynamodb?.SequenceNumber} successfully processed`);
     } catch (err) {
       console.error(err);
       console.log("expandedRecords");
       console.log(JSON.stringify(expandedRecords));
       console.log("certGenFilteredRecords");
       console.log(JSON.stringify(certGenFilteredRecords));
-      batchItemFailures.push({ itemIdentifier: event.messageId });
+      batchItemFailures.push({ itemIdentifier: record.dynamodb?.SequenceNumber ?? "" });
     }
   });
 
