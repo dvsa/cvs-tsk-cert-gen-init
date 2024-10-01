@@ -5,7 +5,7 @@ import {
   DynamoDBBatchItemFailure,
   DynamoDBBatchResponse,
   DynamoDBStreamEvent,
-  Handler
+  Handler,
 } from "aws-lambda";
 import { SQService } from "../services/SQService";
 import { StreamService } from "../services/StreamService";
@@ -51,14 +51,18 @@ const certGenInit: Handler = async (
         await sqService.sendCertGenMessage(stringifiedRecord);
       }
 
-      console.log(`event ${record.dynamodb?.SequenceNumber} successfully processed`);
+      console.log(
+        `event ${record.dynamodb?.SequenceNumber} successfully processed`
+      );
     } catch (err) {
       console.error(err);
       console.log("expandedRecords");
       console.log(JSON.stringify(expandedRecords));
       console.log("certGenFilteredRecords");
       console.log(JSON.stringify(certGenFilteredRecords));
-      batchItemFailures.push({ itemIdentifier: record.dynamodb?.SequenceNumber ?? "" });
+      batchItemFailures.push({
+        itemIdentifier: record.dynamodb?.SequenceNumber ?? "",
+      });
     }
   });
 

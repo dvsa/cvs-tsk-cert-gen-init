@@ -29,9 +29,15 @@ class StreamService {
     console.log(record);
     let records = [];
     // Create from a test result with multiple test types, multiple test result with one test type each
-    if (record.eventName === "INSERT" || (record.eventName === "MODIFY" && StreamService.isProcessModifyEventsEnabled())) {
+    if (
+      record.eventName === "INSERT" ||
+      (record.eventName === "MODIFY" &&
+        StreamService.isProcessModifyEventsEnabled())
+    ) {
       if (record.dynamodb && record.dynamodb.NewImage) {
-        const unmarshalledRecord = unmarshall((record as any).dynamodb.NewImage);
+        const unmarshalledRecord = unmarshall(
+          (record as any).dynamodb.NewImage
+        );
         records = StreamService.expandRecords([unmarshalledRecord]);
       }
     } else {
