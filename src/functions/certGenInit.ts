@@ -28,10 +28,10 @@ const certGenInit: Handler = async (
   }
 
   const batchItemFailures: DynamoDBBatchItemFailure[] = [];
-  let expandedRecords: any[];
-  let certGenFilteredRecords: any[];
+  let expandedRecords: any[] = [];
+  let certGenFilteredRecords: any[] = [];
 
-  event.Records.forEach(async (record) => {
+  for (const record of event.Records) {
     try {
       expandedRecords = StreamService.getTestResultStream(record);
       console.log(`Number of Retrieved records: ${expandedRecords.length}`);
@@ -64,7 +64,7 @@ const certGenInit: Handler = async (
         itemIdentifier: record.dynamodb?.SequenceNumber ?? "",
       });
     }
-  });
+  }
 
   return { batchItemFailures };
 };
