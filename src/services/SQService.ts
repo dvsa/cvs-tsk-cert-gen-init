@@ -53,7 +53,7 @@ class SQService {
    * Send a message to cert-gen queue
    * @param messageBody
    */
-  public async sendCertGenMessage(messageBody: string) {
+  public sendCertGenMessage(messageBody: string) {
     console.log(`Message Body to be sent: ${messageBody}`);
     return this.sendMessage(messageBody, this.config.queueName[0]);
   }
