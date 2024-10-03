@@ -65,18 +65,15 @@ describe("certGenInit Function", () => {
         .mockReturnValue([{ test: "thing" }]);
 
       expect.assertions(1);
-      try {
-        const returnedInfo = await certGenInit(
-          { Records: ["this is an event"] },
-          ctx,
-          () => {
-            return;
-          }
-        );
-        expect(returnedInfo.batchItemFailures.length).toBe(1);
-      } catch (e: any) {
-        throw e;
-      }
+
+      const returnedInfo = await certGenInit(
+        { Records: ["this is an event"] },
+        ctx,
+        () => {
+          return;
+        }
+      );
+      expect(returnedInfo.batchItemFailures.length).toBe(1);
     });
     it("should not throw error if code is InvalidParameterValue", async () => {
       StreamService.getTestResultStream = jest.fn().mockReturnValue([{}]);
