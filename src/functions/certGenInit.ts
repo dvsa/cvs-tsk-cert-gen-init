@@ -48,11 +48,13 @@ const certGenInit: Handler = async (
       for (const record of certGenFilteredRecords) {
         const stringifiedRecord = JSON.stringify(record);
         console.log(stringifiedRecord);
-        Promise.resolve(sqService.sendCertGenMessage(stringifiedRecord)).then(() => {
-          console.log(
-            `event ${record.dynamodb?.SequenceNumber} successfully processed`
-          );
-        });
+        Promise.resolve(sqService.sendCertGenMessage(stringifiedRecord)).then(
+          () => {
+            console.log(
+              `event ${record.dynamodb?.SequenceNumber} successfully processed`
+            );
+          }
+        );
       }
     } catch (err) {
       console.error(err);
