@@ -51,7 +51,9 @@ const certGenInit: Handler = async (
         await sqService.sendCertGenMessage(stringifiedRecord);
       }
 
-      console.log(`event ${record.dynamodb?.SequenceNumber} successfully processed`);
+      console.log(
+        `event ${record.dynamodb?.SequenceNumber} successfully processed`
+      );
     } catch (err) {
       console.error(err);
       console.log("expandedRecords");

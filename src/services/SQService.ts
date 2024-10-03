@@ -8,7 +8,7 @@ import {
   ReceiveMessageCommandOutput,
   SQSClient,
   SendMessageCommand,
-  SendMessageCommandInput
+  SendMessageCommandInput,
 } from "@aws-sdk/client-sqs";
 
 import { Service } from "../models/injector/ServiceDecorator";
