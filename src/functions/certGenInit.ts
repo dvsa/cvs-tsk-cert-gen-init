@@ -30,6 +30,16 @@ const certGenInit: Handler = async (
   const batchItemFailures: DynamoDBBatchItemFailure[] = [];
   let expandedRecords: any[] = [];
   let certGenFilteredRecords: any[] = [];
+  let sqService: SQService;
+
+  try {
+    // Instantiate the Simple Queue Service
+    sqService = new SQService(new SQSClient());
+  } catch (e) {
+    console.error(e);
+    console.log("error creating SQS instance");
+    throw e;
+  }
 
   for (const record of event.Records) {
     try {
@@ -41,9 +51,6 @@ const certGenInit: Handler = async (
       console.log(
         `Number of Filtered Retrieved Records: ${certGenFilteredRecords.length}`
       );
-
-      // Instantiate the Simple Queue Service
-      const sqService: SQService = new SQService(new SQSClient());
 
       for (const record of certGenFilteredRecords) {
         const stringifiedRecord = JSON.stringify(record);
