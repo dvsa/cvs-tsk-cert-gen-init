@@ -9,6 +9,7 @@ import {
   SendMessageCommandOutput,
 } from "@aws-sdk/client-sqs";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+import { DynamoDBRecord } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import { Injector } from "../../src/models/injector/Injector";
 import { SQService } from "../../src/services/SQService";
@@ -110,7 +111,7 @@ describe("cert-gen-init", () => {
       () => {
         it("should result in an array of filtered js objects", () => {
           processedEvent = StreamService.getTestResultStream(
-            event.Records[0] as any
+            event.Records[0] as DynamoDBRecord
           );
           expect(processedEvent).toEqual(expectedResult);
         });
@@ -124,7 +125,7 @@ describe("cert-gen-init", () => {
           process.env.PROCESS_MODIFY_EVENTS = "false";
           event.Records[0].eventName = "MODIFY";
           processedEvent = StreamService.getTestResultStream(
-            event.Records[0] as any
+            event.Records[0] as DynamoDBRecord
           );
           expect(processedEvent).toHaveLength(0);
         });
@@ -133,7 +134,7 @@ describe("cert-gen-init", () => {
           process.env.PROCESS_MODIFY_EVENTS = "true";
           event.Records[0].eventName = "MODIFY";
           processedEvent = StreamService.getTestResultStream(
-            event.Records[0] as any
+            event.Records[0] as DynamoDBRecord
           );
           expect(processedEvent).toHaveLength(1);
           expect(processedEvent).toEqual(expectedResult);
@@ -151,7 +152,7 @@ describe("cert-gen-init", () => {
             eventWithTestTypeObject
           ) as any;
           processedEvent = StreamService.getTestResultStream(
-            mainEvent.Records[0] as any
+            mainEvent.Records[0] as DynamoDBRecord
           );
           expect(processedEvent).toEqual([]);
         });
@@ -160,7 +161,7 @@ describe("cert-gen-init", () => {
           process.env.PROCESS_MODIFY_EVENTS = "";
           event.Records[0].eventName = "MODIFY";
           expect(() => {
-            StreamService.getTestResultStream(event.Records[0] as any);
+            StreamService.getTestResultStream(event.Records[0] as DynamoDBRecord);
           }).toThrowError();
         });
       }

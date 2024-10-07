@@ -36,9 +36,8 @@ const certGenInit: Handler = async (
     // Instantiate the Simple Queue Service
     sqService = new SQService(new SQSClient());
   } catch (e) {
-    console.error(e);
-    console.log("error creating SQS instance");
-    throw e;
+    console.error(`Error creating SQS instance:  ${e}`);
+    throw new Error("Failed to initialize SQS service");
   }
 
   for (const record of event.Records) {
