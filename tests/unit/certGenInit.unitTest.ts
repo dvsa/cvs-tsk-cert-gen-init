@@ -161,7 +161,9 @@ describe("cert-gen-init", () => {
           process.env.PROCESS_MODIFY_EVENTS = "";
           event.Records[0].eventName = "MODIFY";
           expect(() => {
-            StreamService.getTestResultStream(event.Records[0] as DynamoDBRecord);
+            StreamService.getTestResultStream(
+              event.Records[0] as DynamoDBRecord
+            );
           }).toThrowError();
         });
       }
