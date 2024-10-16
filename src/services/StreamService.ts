@@ -25,24 +25,25 @@ class StreamService {
    *  └── test-type-3
    * @param event
    */
-  public static getTestResultStream(event: any) {
-    console.log(event);
+  public static getTestResultStream(record: DynamoDBRecord) {
+    console.log(record);
+    let records = [];
     // Create from a test result with multiple test types, multiple test result with one test type each
-    const records: any[] = event.Records.filter((record: DynamoDBRecord) => {
-      // Retrieve "INSERT" events
-      return (
-        record.eventName === "INSERT" ||
-        (record.eventName === "MODIFY" &&
-          StreamService.isProcessModifyEventsEnabled())
-      );
-    }).map((record: any) => {
-      // Convert to JS object
+    if (
+      record.eventName === "INSERT" ||
+      (record.eventName === "MODIFY" &&
+        StreamService.isProcessModifyEventsEnabled())
+    ) {
       if (record.dynamodb && record.dynamodb.NewImage) {
-        return unmarshall(record.dynamodb.NewImage);
+        const unmarshalledRecord = unmarshall(
+          (record as any).dynamodb.NewImage
+        );
+        records = StreamService.expandRecords([unmarshalledRecord]);
       }
-    });
-
-    return StreamService.expandRecords(records);
+    } else {
+      console.log("event name was not of correct type");
+    }
+    return records;
   }
 
   /**
@@ -75,22 +76,23 @@ class StreamService {
         Object.assign(templateRecord, {});
         console.log("before for each");
         if (record.testTypes instanceof Array) {
-              record.testTypes?.forEach((testType: any, i: number, array: any[]) => {
-                  console.log("in for each");
-                  const clonedRecord: any = Object.assign({}, templateRecord); // Create record from template
-                  Object.assign(clonedRecord, { testTypes: testType }); // Assign it the test type
-                  Object.assign(clonedRecord, {
-                      // Assign certificate order number
-                      order: {
-                          current: i + 1,
-                          total: array.length,
-                      },
-                  });
-
-                  splittedRecords.push(clonedRecord);
+          record.testTypes?.forEach(
+            (testType: any, i: number, array: any[]) => {
+              console.log("in for each");
+              const clonedRecord: any = Object.assign({}, templateRecord); // Create record from template
+              Object.assign(clonedRecord, { testTypes: testType }); // Assign it the test type
+              Object.assign(clonedRecord, {
+                // Assign certificate order number
+                order: {
+                  current: i + 1,
+                  total: array.length,
+                },
               });
-          }
 
+              splittedRecords.push(clonedRecord);
+            }
+          );
+        }
 
         console.log("after for each");
         return splittedRecords;

@@ -1,3 +1,4 @@
+import { DynamoDBRecord } from "aws-lambda";
 import { StreamService } from "../../src/services/StreamService";
 import { Utils } from "../../src/utils/Utils";
 import * as event from "../resources/stream-event.json";
@@ -6,7 +7,9 @@ describe("utils", () => {
   let expandedRecords: any[];
 
   beforeEach(() => {
-    expandedRecords = StreamService.getTestResultStream(event);
+    expandedRecords = StreamService.getTestResultStream(
+      event.Records[0] as DynamoDBRecord
+    );
   });
 
   afterAll(() => {

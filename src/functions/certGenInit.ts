@@ -1,6 +1,12 @@
-import { Callback, Context, Handler } from "aws-lambda";
-import { ServiceException } from "@smithy/smithy-client";
-import { SendMessageCommandOutput, SQSClient } from "@aws-sdk/client-sqs";
+import { SQSClient } from "@aws-sdk/client-sqs";
+import {
+  Callback,
+  Context,
+  DynamoDBBatchItemFailure,
+  DynamoDBBatchResponse,
+  DynamoDBStreamEvent,
+  Handler,
+} from "aws-lambda";
 import { SQService } from "../services/SQService";
 import { StreamService } from "../services/StreamService";
 import { Utils } from "../utils/Utils";
@@ -12,47 +18,61 @@ import { Utils } from "../utils/Utils";
  * @param callback - callback function
  */
 const certGenInit: Handler = async (
-  event: any,
+  event: DynamoDBStreamEvent,
   context?: Context,
   callback?: Callback
-): Promise<void | Array<SendMessageCommandOutput | any>> => {
+): Promise<DynamoDBBatchResponse> => {
   if (!event) {
     console.error("ERROR: event is not defined.");
-    return;
+    throw new Error("ERROR: event is not defined");
   }
 
-  // Convert the received event into a readable array of filtered test results
-  const expandedRecords: any[] = StreamService.getTestResultStream(event);
-  console.log(`Number of Retrieved records: ${expandedRecords.length}`);
-  const certGenFilteredRecords: any[] =
-    Utils.filterCertificateGenerationRecords(expandedRecords);
+  const batchItemFailures: DynamoDBBatchItemFailure[] = [];
+  let expandedRecords: any[] = [];
+  let certGenFilteredRecords: any[] = [];
+  let sqService: SQService;
 
-  console.log(`Number of Filtered Retrieved Records: ${certGenFilteredRecords.length}`);
+  try {
+    // Instantiate the Simple Queue Service
+    sqService = new SQService(new SQSClient());
+  } catch (e) {
+    console.error(`Error creating SQS instance:  ${e}`);
+    throw new Error("Failed to initialize SQS service");
+  }
 
-  // Instantiate the Simple Queue Service
-  const sqService: SQService = new SQService(new SQSClient());
-  const sendMessagePromises: Array<
-    Promise<SendMessageCommandOutput | ServiceException>
-  > = [];
+  for (const record of event.Records) {
+    try {
+      expandedRecords = StreamService.getTestResultStream(record);
+      console.log(`Number of Retrieved records: ${expandedRecords.length}`);
 
-  certGenFilteredRecords.forEach((record: any) => {
-    const stringifiedRecord = JSON.stringify(record);
-    console.log(stringifiedRecord);
-    sendMessagePromises.push(
-      sqService.sendCertGenMessage(stringifiedRecord)
-    );
-  });
+      certGenFilteredRecords =
+        Utils.filterCertificateGenerationRecords(expandedRecords);
+      console.log(
+        `Number of Filtered Retrieved Records: ${certGenFilteredRecords.length}`
+      );
 
-  return Promise.all(sendMessagePromises).catch((error) => {
-    console.error(error);
-    console.log("expandedRecords");
-    console.log(JSON.stringify(expandedRecords));
-    console.log("certGenFilteredRecords");
-    console.log(JSON.stringify(certGenFilteredRecords));
-    if (error.code !== "InvalidParameterValue") {
-      throw error;
+      for (const record of certGenFilteredRecords) {
+        const stringifiedRecord = JSON.stringify(record);
+        console.log(stringifiedRecord);
+        await sqService.sendCertGenMessage(stringifiedRecord);
+      }
+
+      console.log(
+        `event ${record.dynamodb?.SequenceNumber} successfully processed`
+      );
+    } catch (err) {
+      console.error(err);
+      console.log("expandedRecords");
+      console.log(JSON.stringify(expandedRecords));
+      console.log("certGenFilteredRecords");
+      console.log(JSON.stringify(certGenFilteredRecords));
+      batchItemFailures.push({
+        itemIdentifier: record.dynamodb?.SequenceNumber ?? "",
+      });
     }
-  });
+  }
+
+  return { batchItemFailures };
 };
 
 export { certGenInit };

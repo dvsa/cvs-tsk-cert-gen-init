@@ -9,8 +9,6 @@ import {
   SQSClient,
   SendMessageCommand,
   SendMessageCommandInput,
-  SendMessageCommandOutput,
-  SetQueueAttributesCommand,
 } from "@aws-sdk/client-sqs";
 
 import { Service } from "../models/injector/ServiceDecorator";
@@ -69,7 +67,7 @@ class SQService {
     messageBody: string,
     queueName: string,
     messageAttributes?: Record<string, MessageAttributeValue>
-  ): Promise<SendMessageCommandOutput | ServiceException> {
+  ) {
     // Get the queue URL for the provided queue name
     const queueUrlResult: GetQueueUrlCommandOutput = await this.sqsClient.send(
       new GetQueueUrlCommand({ QueueName: queueName })
@@ -86,7 +84,7 @@ class SQService {
     }
 
     // Send a message to the queue
-    return this.sqsClient.send(
+    await this.sqsClient.send(
       new SendMessageCommand(params as SendMessageCommandInput)
     );
   }

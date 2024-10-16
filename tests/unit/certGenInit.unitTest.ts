@@ -4,18 +4,19 @@ import {
   GetQueueUrlCommand,
   ReceiveMessageCommand,
   ReceiveMessageCommandOutput,
+  SQSClient,
   SendMessageCommand,
   SendMessageCommandOutput,
-  SQSClient,
 } from "@aws-sdk/client-sqs";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+import { DynamoDBRecord } from "aws-lambda";
+import { mockClient } from "aws-sdk-client-mock";
 import { Injector } from "../../src/models/injector/Injector";
 import { SQService } from "../../src/services/SQService";
 import { StreamService } from "../../src/services/StreamService";
 import { Configuration } from "../../src/utils/Configuration";
 import { SQMockClient } from "../models/SQMockClient";
 import event from "../resources/stream-event.json";
-import { mockClient } from "aws-sdk-client-mock";
-import {marshall, unmarshall} from "@aws-sdk/util-dynamodb";
 
 const record = {
   testerStaffId: "1",
@@ -109,7 +110,9 @@ describe("cert-gen-init", () => {
       "when fetching test result stream and the eventName is INSERT",
       () => {
         it("should result in an array of filtered js objects", () => {
-          processedEvent = StreamService.getTestResultStream(event);
+          processedEvent = StreamService.getTestResultStream(
+            event.Records[0] as DynamoDBRecord
+          );
           expect(processedEvent).toEqual(expectedResult);
         });
       }
@@ -121,26 +124,36 @@ describe("cert-gen-init", () => {
         it("shouldn't result in an array of filtered js objects when PROCESS_MODIFY_EVENTS is false", () => {
           process.env.PROCESS_MODIFY_EVENTS = "false";
           event.Records[0].eventName = "MODIFY";
-          processedEvent = StreamService.getTestResultStream(event);
+          processedEvent = StreamService.getTestResultStream(
+            event.Records[0] as DynamoDBRecord
+          );
           expect(processedEvent).toHaveLength(0);
         });
 
         it("should result in an array of filtered js objects when PROCESS_MODIFY_EVENTS is true", () => {
           process.env.PROCESS_MODIFY_EVENTS = "true";
           event.Records[0].eventName = "MODIFY";
-          processedEvent = StreamService.getTestResultStream(event);
+          processedEvent = StreamService.getTestResultStream(
+            event.Records[0] as DynamoDBRecord
+          );
           expect(processedEvent).toHaveLength(1);
           expect(processedEvent).toEqual(expectedResult);
         });
 
         it("should result in an empty array when the test type is an object", () => {
           process.env.PROCESS_MODIFY_EVENTS = "true";
-          const eventWithTestTypeObject = unmarshall({...event}.Records[0].dynamodb.NewImage);
+          const eventWithTestTypeObject = unmarshall(
+            { ...event }.Records[0].dynamodb.NewImage
+          );
           eventWithTestTypeObject.testTypes = {};
           event.Records[0].eventName = "MODIFY";
-          const mainEvent = {...event};
-          mainEvent.Records[0].dynamodb.NewImage = marshall(eventWithTestTypeObject) as any;
-          processedEvent = StreamService.getTestResultStream(mainEvent);
+          const mainEvent = { ...event };
+          mainEvent.Records[0].dynamodb.NewImage = marshall(
+            eventWithTestTypeObject
+          ) as any;
+          processedEvent = StreamService.getTestResultStream(
+            mainEvent.Records[0] as DynamoDBRecord
+          );
           expect(processedEvent).toEqual([]);
         });
 
@@ -148,7 +161,9 @@ describe("cert-gen-init", () => {
           process.env.PROCESS_MODIFY_EVENTS = "";
           event.Records[0].eventName = "MODIFY";
           expect(() => {
-            StreamService.getTestResultStream(event);
+            StreamService.getTestResultStream(
+              event.Records[0] as DynamoDBRecord
+            );
           }).toThrowError();
         });
       }
